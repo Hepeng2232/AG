@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AG · OC 俱乐部 — 用 AI，创造更多可能</title>
+<meta name="description" content="OC 俱乐部 · AG —— 一个让想法变成现实的地方。用 AI，创造更多可能。">
+<meta name="theme-color" content="#fff8ed">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff5fa2'/%3E%3Cstop offset='.5' stop-color='%23ffc857'/%3E%3Cstop offset='1' stop-color='%2335d0e0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230b1130'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='32' font-weight='900' text-anchor='middle' fill='url(%23g)'%3EAG%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- 背景层 -->
+<div class="grain" aria-hidden="true"></div>
+<div class="bg-aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+<canvas id="starbg" class="starbg" aria-hidden="true"></canvas>
+
+<!-- 加载页 -->
+<div class="loader" id="loader">
+  <div class="loader-mark" aria-hidden="true"><span>A</span><span>G</span></div>
+  <p class="loader-text">正在把想法变成现实<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
+  <div class="loader-bar"><i id="loaderBar"></i></div>
+  <p class="loader-sub">OC 俱乐部 ✦ 用 AI，创造更多可能</p>
+</div>
+
+<!-- 光标 -->
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+<!-- 顶部 -->
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+<header class="topbar" id="topbar">
+  <a class="brand" href="#home" data-sfx="hover">
+    <span class="brand-mark">AG</span>
+    <span class="brand-txt">OC 俱乐部<em>一个让想法变成现实的地方</em></span>
+  </a>
+  <nav class="nav" aria-label="主导航">
+    <a href="#home" class="nav-link is-active">首页</a>
+    <a href="#boards" class="nav-link">四大板块</a>
+    <a href="#lab" class="nav-link">灵感实验室</a>
+    <a href="#desk" class="nav-link">工作台</a>
+    <a href="#member" class="nav-link">入场券</a>
+  </nav>
+  <div class="top-actions">
+    <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="声音开关" title="声音开关">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h3.5L13 20V4L7.5 9H4z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="wave2" d="M19 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M4 4l16 16"/></svg>
+    </button>
+    <button class="btn btn-sm btn-primary magnetic" id="posterBtn" data-sfx="click">原版海报</button>
+    <a class="btn btn-sm btn-ghost magnetic" href="#member" data-sfx="click">加入 AG</a>
+  </div>
+</header>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <section id="home" class="hero">
+    <canvas id="heroFx" class="hero-fx" aria-hidden="true"></canvas>
+
+    <div class="hero-left reveal">
+      <span class="chip">OC 俱乐部 <b>✦</b></span>
+      <h2 class="hero-claim">一个让想法<br><span class="hl">变成现实</span>的地方</h2>
+      <p class="hero-note">从灵感到作品，中间只差一次动手。</p>
+      <div class="hero-neon" aria-hidden="true"><span>AI</span></div>
+      <div class="idea-line" aria-hidden="true">
+        <span>从灵感</span>
+        <i class="idea-arrow"><svg viewBox="0 0 60 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 18C14 6 34 4 50 10"/><path d="M50 10l-7-1M50 10l-3 7"/></svg></i>
+        <span>作品</span>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <span class="spark s1" aria-hidden="true">✦</span>
+      <span class="spark s2" aria-hidden="true">✧</span>
+      <span class="spark s3" aria-hidden="true">✦</span>
+      <span class="spark s4" aria-hidden="true">⋆</span>
+
+      <div class="planet planet-big" aria-hidden="true">
+        <svg viewBox="0 0 220 220">
+          <defs>
+            <radialGradient id="pg" cx="35%" cy="30%" r="75%">
+              <stop offset="0" stop-color="#b6fff2"/><stop offset="45%" stop-color="#35d0e0"/><stop offset="100%" stop-color="#2b7bbd"/>
+            </radialGradient>
+            <linearGradient id="ring" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#ffc857"/><stop offset="1" stop-color="#ff9f43"/>
+            </linearGradient>
+          </defs>
+          <g transform="rotate(-20 110 110)">
+            <ellipse cx="110" cy="110" rx="100" ry="26" fill="none" stroke="url(#ring)" stroke-width="8" opacity=".85"/>
+            <circle cx="110" cy="108" r="44" fill="url(#pg)"/>
+            <path d="M-6 110a100 26 0 0 0 200 0" fill="none" stroke="url(#ring)" stroke-width="8" opacity=".95" transform="translate(0,-2)"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="planet planet-small" aria-hidden="true"></div>
+
+      <h1 class="hero-ag" id="heroAG" title="点我试试"><span class="ag-a">A</span><span class="ag-g">G</span></h1>
+
+      <p class="hero-sub">用 AI，创造更多可能<span class="bang">！</span></p>
+      <svg class="swoosh" viewBox="0 0 420 40" aria-hidden="true">
+        <defs><linearGradient id="sw" x1="0" x2="1"><stop offset="0" stop-color="#8ef0b0"/><stop offset=".5" stop-color="#4fd6e6"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs>
+        <path d="M6 28C90 8 250 4 414 20" fill="none" stroke="url(#sw)" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+        <path d="M20 36C110 22 260 18 380 30" fill="none" stroke="url(#sw)" stroke-width="3.5" stroke-linecap="round" opacity=".45"/>
+      </svg>
+
+      <div class="hero-cta">
+        <a class="btn btn-primary magnetic" href="#lab" data-sfx="click">
+          去创造点什么 <span class="btn-arrow">→</span>
+        </a>
+        <button class="btn btn-ghost magnetic" id="ideaBtn" data-sfx="click">给我一个灵感</button>
+      </div>
+      <p class="hero-tip"><span class="pulse-dot"></span>点击 AG，看它炸成星星</p>
+    </div>
+
+    <aside class="hero-right reveal">
+      <p class="hero-right-title">不只是学习<br>更是<span class="hl">创造</span> <span class="smiley">☺</span></p>
+      <ul class="hero-pills">
+        <li class="pill p1">有趣的伙伴</li>
+        <li class="pill p2">实用的技能</li>
+        <li class="pill p3">好玩的项目</li>
+        <li class="pill p4">无限的可能</li>
+      </ul>
+      <div class="hero-stickers" aria-hidden="true">
+        <span>💡</span><span>🚀</span><span>🛸</span>
+      </div>
+      <div class="hero-stamp" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <path id="stampPath" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/>
+          </defs>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(27,21,51,.16)" stroke-width="1.2" stroke-dasharray="3 6"/>
+          <text>
+            <textPath href="#stampPath" startOffset="0">✦ 用 AI 创造更多可能 · OC 俱乐部 ✦</textPath>
+          </text>
+          <text class="stamp-star" x="60" y="70" text-anchor="middle">✦</text>
+        </svg>
+      </div>
+    </aside>
+
+    <div class="scroll-cue" aria-hidden="true"><span>向下滚动</span><i></i></div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <span>用 AI，创造更多可能</span><b>✦</b>
+      <span>从灵感到作品</span><b>✦</b>
+      <span>学习 · 交流 · 实践 · 创造</span><b>✦</b>
+      <span>AG 等你一起探索 AI 的无限可能</span><b>✦</b>
+      <span>Good ideas, better with AI</span><b>✦</b>
+    </div>
+  </div>
+
+  <!-- ============ 四大板块 ============ -->
+  <section id="boards" class="section boards">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="kicker">✦ 四大板块</span>
+        <h2>不止是听课，<br><span class="grad-text">是当场做出东西</span></h2>
+        <p class="lead">四个方向，四种动手方式。鼠标放上去，它会朝你倾斜。</p>
+      </header>
+
+      <div class="boards-grid" id="boardsGrid">
+        <article class="board-card c1 reveal" data-board="0" tabindex="0" role="button" aria-label="查看 AIGC 教学详情">
+          <div class="card-spot"></div>
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.6l5.4 3.4L10 15.4z"/></svg>
+            </span>
+            <span class="card-no">01</span>
+          </div>
+          <h3>AIGC 教学</h3>
+          <ul class="card-list">
+            <li>AI 绘图 / 生成视频</li>
+            <li>文案 / 设计 / 音乐</li>
+            <li>从入门到实战</li>
+          </ul>
+          <div class="card-visual cv-art">
+            <span class="cv-star">✦</span><span class="cv-tag">AI 绘图</span>
+          </div>
+          <span class="card-more">动手看看 <i>→</i></span>
+        </article>
+
+        <article class="board-card c2 reveal" data-board="1" tabindex="0" role="button" aria-label="查看 AI 应用详情">
+          <div class="card-spot"></div>
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6"/></svg>
+            </span>
+            <span class="card-no">02</span>
+          </div>
+          <h3>AI 应用</h3>
+          <ul class="card-list">
+            <li>工具使用技巧</li>
+            <li>让 AI 帮你学习 / 工作</li>
+            <li>提升效率与创造力</li>
+          </ul>
+          <div class="card-visual cv-chat">
+            <div class="bubble b1">帮我把周报写得更像人话</div>
+            <div class="bubble b2"><b>AG</b> 收到，已帮你加了点人味儿 ✦</div>
+          </div>
+          <span class="card-more">动手看看 <i>→</i></span>
+        </article>
+
+        <article class="board-card c3 reveal" data-board="2" tabindex="0" role="button" aria-label="查看应用开发详情">
+          <div class="card-spot"></div>
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg>
+            </span>
+            <span class="card-no">03</span>
+          </div>
+          <h3>应用开发</h3>
+          <ul class="card-list">
+            <li>低代码 / 小程序</li>
+            <li>Web / App 开发</li>
+            <li>用 AI 打造自己的产品</li>
+          </ul>
+          <div class="card-visual cv-code">
+            <div class="code-line"><b>const</b> idea = <em>ship</em>(<u>'AG'</u>);</div>
+            <div class="code-line dim">// 今天就把点子发上线</div>
+          </div>
+          <span class="card-more">动手看看 <i>→</i></span>
+        </article>
+
+        <article class="board-card c4 reveal" data-board="3" tabindex="0" role="button" aria-label="查看一起创造详情">
+          <div class="card-spot"></div>
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6V17h5.4v-1.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg>
+            </span>
+            <span class="card-no">04</span>
+          </div>
+          <h3>一起创造</h3>
+          <ul class="card-list">
+            <li>个人 &amp; 团队项目</li>
+            <li>AI 创意挑战</li>
+            <li>把想法变成作品</li>
+          </ul>
+          <div class="card-visual cv-shots">
+            <i class="shot1"></i><i class="shot2"></i><span class="cv-heart">♥</span>
+          </div>
+          <span class="card-more">动手看看 <i>→</i></span>
+        </article>
+      </div>
+
+      <div class="board-foot reveal">
+        <span>学习</span><b>✦</b><span>交流</span><b>✦</b><span>实践</span><b>✦</b><span>创造</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 灵感实验室 ============ -->
+  <section id="lab" class="section lab">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="kicker">✦ 灵感实验室</span>
+        <h2>给 AG 一句话，<br><span class="grad-text">它还你一张作品</span></h2>
+        <p class="lead">这不是真的 AI 出图——是本地绘制的「灵感样本」。但它会证明：一个好点子，值得先被看见。</p>
+      </header>
+
+      <div class="lab-grid">
+        <div class="lab-panel reveal">
+          <label class="field">
+            <span class="field-label">你的灵感</span>
+            <input id="ideaInput" class="input" maxlength="28" placeholder="比如：用 AI 做一张校园乐队招募海报" autocomplete="off">
+          </label>
+
+          <div class="field">
+            <span class="field-label">想要的形式</span>
+            <div class="chips" id="styleChips" role="group" aria-label="作品形式">
+              <button class="chip-btn is-on" data-style="poster">海报</button>
+              <button class="chip-btn" data-style="illust">插画</button>
+              <button class="chip-btn" data-style="code">代码</button>
+              <button class="chip-btn" data-style="video">短视频</button>
+              <button class="chip-btn" data-style="music">音乐</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field-label">灵感浓度</span>
+            <input type="range" id="density" min="10" max="100" value="68" class="range">
+            <div class="range-scale"><span>朴素</span><span>炸裂</span></div>
+          </div>
+
+          <div class="lab-actions">
+            <button class="btn btn-primary magnetic" id="generateBtn" data-sfx="click">
+              <span class="btn-label">把灵感变成作品</span><span class="btn-arrow">✦</span>
+            </button>
+            <button class="btn btn-ghost" id="diceBtn" data-sfx="click" title="随机一个灵感">🎲 换个灵感</button>
+          </div>
+          <p class="tiny-note">小提示：先在下面「灵感浓度」拉满，再点生成，效果最明显。</p>
+        </div>
+
+        <div class="lab-stage reveal">
+          <div class="artifact">
+            <div class="artifact-frame">
+              <canvas id="artCanvas" width="600" height="800" aria-label="生成的灵感作品"></canvas>
+              <div class="artifact-sheen" aria-hidden="true"></div>
+              <span class="artifact-badge" id="artBadge">AG · POSTER</span>
+            </div>
+            <div class="artifact-info">
+              <div class="type-out" id="typeOut"></div>
+              <div class="artifact-tags" id="artTags"></div>
+            </div>
+            <div class="artifact-actions">
+              <button class="btn btn-sm btn-ghost" id="downloadBtn" data-sfx="click">下载这张</button>
+              <button class="btn btn-sm btn-ghost" id="bigArtBtn" data-sfx="click">看大图</button>
+            </div>
+          </div>
+          <div class="gen-overlay" id="genOverlay" aria-hidden="true">
+            <div class="gen-ring"></div>
+            <p>AG 正在把想法拼起来…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 工作台 ============ -->
+  <section id="desk" class="section desk">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="kicker">✦ 灵感工作台</span>
+        <h2>随手拖，<br><span class="grad-text">把它摆成你的样子</span></h2>
+        <p class="lead">拖拽贴纸、双击转角度、松手有惯性。这里是 AG 的桌面，也是你的。</p>
+      </header>
+
+      <div class="desk-panel reveal" id="deskPanel">
+        <div class="desk-grid" aria-hidden="true"></div>
+        <div class="desk-hint" id="deskHint">🖐 拖动这些贴纸 → 布置你的工作台</div>
+        <div class="desk-items" id="deskItems"></div>
+        <div class="desk-bar">
+          <span class="desk-count" id="deskCount">贴纸 10 张</span>
+          <div class="desk-btns">
+            <button class="btn btn-sm btn-ghost" id="shuffleBtn" data-sfx="click">随机打乱</button>
+            <button class="btn btn-sm btn-ghost" id="resetDeskBtn" data-sfx="click">复原</button>
+          </div>
+        </div>
+      </div>
+      <p class="tiny-note center">双击贴纸可以转 15°，长按屏幕也能拖。够无聊的时候，把所有贴纸堆到中间试试。</p>
+    </div>
+  </section>
+
+  <!-- ============ 入场券 ============ -->
+  <section id="member" class="section member">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <span class="kicker">✦ 入场券</span>
+        <h2>写个名字，<br><span class="grad-text">领一张 AG 会员卡</span></h2>
+        <p class="lead">纯本地绘制，不会上传任何信息。生成后可以直接下载带走。</p>
+      </header>
+
+      <div class="member-grid">
+        <div class="member-form reveal">
+          <label class="field">
+            <span class="field-label">你的名字 / 昵称</span>
+            <input id="nameInput" class="input" maxlength="12" value="新朋友" autocomplete="off" placeholder="输入名字">
+          </label>
+          <div class="field">
+            <span class="field-label">你的身份</span>
+            <div class="chips" id="roleChips" role="group" aria-label="身份">
+              <button class="chip-btn is-on" data-role="学习者">学习者</button>
+              <button class="chip-btn" data-role="创作者">创作者</button>
+              <button class="chip-btn" data-role="开发者">开发者</button>
+              <button class="chip-btn" data-role="探索者">探索者</button>
+            </div>
+          </div>
+          <div class="serial-row">
+            <span>卡号</span><b id="serialOut">AG-0000-0000</b>
+          </div>
+          <div class="member-actions">
+            <button class="btn btn-primary magnetic" id="downloadCardBtn" data-sfx="click">下载会员卡 <span class="btn-arrow">↓</span></button>
+            <button class="btn btn-ghost" id="randomNameBtn" data-sfx="click">随机一个</button>
+          </div>
+          <p class="tiny-note">每个人都是 AG 的一部分。真的。</p>
+        </div>
+
+        <div class="member-preview reveal">
+          <div class="card-halo"></div>
+          <canvas id="memberCanvas" width="760" height="460" aria-label="AG 会员卡预览"></canvas>
+          <button class="card-flip" id="flipCardBtn" data-sfx="click">↻ 翻个面</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JOIN ============ -->
+  <section id="join" class="section join">
+    <div class="wrap join-wrap">
+      <p class="join-kicker reveal">如果你也想用 AI 做点什么</p>
+      <h2 class="join-title reveal"><span class="grad-text">那就来 AG 吧！</span></h2>
+      <p class="join-sub reveal">AG 等你一起，探索 AI 的无限可能。</p>
+      <div class="join-cta reveal">
+        <a class="btn btn-primary btn-lg magnetic" href="#member" data-sfx="click">领取我的入场券</a>
+        <button class="btn btn-ghost btn-lg magnetic" id="posterBtn2" data-sfx="click">看看原版海报</button>
+      </div>
+      <p class="join-foot reveal">学习 ✦ 交流 ✦ 实践 ✦ 创造</p>
+    </div>
+    <div class="join-orbit" aria-hidden="true">
+      <i>✦</i><i>✧</i><i>✦</i><i>⋆</i><i>✦</i>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <span class="brand-mark">AG</span>
+      <p>OC 俱乐部 · 一个让想法变成现实的地方</p>
+    </div>
+    <div class="footer-links">
+      <a href="#home">回到顶部</a>
+      <a href="#boards">四大板块</a>
+      <a href="#lab">灵感实验室</a>
+      <a href="#member">入场券</a>
+    </div>
+    <p class="footer-fine">页面里的作品、卡号均由浏览器本地生成 · 想再做点别的？把想法丢给 AG。</p>
+  </div>
+</footer>
+
+<!-- 弹层 -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="document">
+    <button class="modal-close" data-close aria-label="关闭">✕</button>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+
+<script src="app.js" defer></script>
+</body>
+</html>
