@@ -9,8 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFD21F' stroke='%23141414' stroke-width='6'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='30' font-weight='900' text-anchor='middle' fill='%23FF4B2E'%3EAG%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFD21F'/%3E%3Crect x='5' y='5' width='54' height='54' fill='none' stroke='%23141414' stroke-width='4'/%3E%3Cpath d='M12 48L22 15L32 48' fill='none' stroke='%23141414' stroke-width='4.6'/%3E%3Cpath d='M16 37H28' stroke='%23141414' stroke-width='3.6'/%3E%3Cpath d='M52.2 23.8A10 10 0 1 0 52.2 40.2' fill='none' stroke='%23FF4B2E' stroke-width='5.4'/%3E%3Cpath d='M46.8 32H55' stroke='%23FF4B2E' stroke-width='4.4'/%3E%3C/svg%3E">
 <style>
+
 /* ============================================================
    AG · OC CLUB — NEO-BRUTALIST CREATIVE TECH
    纸底 / 墨线 / 硬阴影 / 电光黄 —— 单文件，零依赖
@@ -1047,6 +1048,114 @@ ul{ list-style:none }
   .stage-stamp{ top:-24px; right:-8px; width:98px; height:98px }
   .stage-chip{ left:-8px }
 }
+
+/* ============ 灵感老虎机 / LUCK MACHINE ============ */
+.slot-panel{ overflow:hidden }
+.panel-title .pt-right{ display:flex; align-items:center; gap:10px }
+.sound-btn{
+  font:700 9.5px/1 var(--font-m); letter-spacing:.12em; text-transform:uppercase;
+  border:2px solid var(--ink); background:var(--paper); padding:5px 8px; cursor:pointer;
+  transition:background .18s, transform .18s var(--ease-spring);
+}
+.sound-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--ink) }
+.sound-btn[aria-pressed="false"]{ opacity:.42 }
+
+.slot-body{ display:flex; gap:16px; align-items:stretch }
+.slot-reels{
+  flex:1; min-width:0; display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  background:var(--ink); border:3px solid var(--ink);
+  box-shadow:inset 0 0 0 2px var(--yellow), 5px 5px 0 var(--ink);
+  padding:10px 10px 10px;
+}
+.reel-col{ display:flex; flex-direction:column; gap:6px; min-width:0 }
+.reel-label{ font:700 9.5px/1 var(--font-m); letter-spacing:.14em; text-transform:uppercase; color:var(--yellow); text-align:center }
+.reel{ position:relative; height:204px; overflow:hidden; background:var(--paper-2); border:2px solid var(--ink) }
+.reel::before,.reel::after{ content:''; position:absolute; left:0; right:0; height:30px; z-index:2; pointer-events:none }
+.reel::before{ top:0; background:linear-gradient(var(--paper-2), rgba(251,249,242,0)) }
+.reel::after{ bottom:0; background:linear-gradient(rgba(251,249,242,0), var(--paper-2)) }
+.reel-track{ position:absolute; left:0; right:0; top:0; will-change:transform }
+.reel-item{
+  height:68px; display:grid; place-items:center; padding:0 4px;
+  font:900 clamp(13px,1.35vw,16.5px)/1.2 var(--font-d); text-align:center;
+  border-bottom:2px dashed rgba(20,20,20,.16); word-break:break-word;
+}
+.reel.is-hit{ animation:reelHit .44s var(--ease-spring) }
+@keyframes reelHit{ 0%{ transform:translateX(-4px) } 35%{ transform:translateX(4px) } 65%{ transform:translateX(-2px) } 100%{ transform:none } }
+
+.slot-lever-wrap{ flex:none; width:62px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px }
+.slot-lever{ position:relative; width:44px; height:150px; cursor:grab; touch-action:none }
+.slot-lever:active,.slot-lever.is-pulling{ cursor:grabbing }
+.slot-lever .lv-rod{ position:absolute; left:50%; top:16px; bottom:6px; width:12px; margin-left:-6px; background:var(--ink) }
+.slot-lever .lv-knob{
+  position:absolute; left:50%; top:0; width:42px; height:42px; margin-left:-21px;
+  background:var(--red); border:3px solid var(--ink); border-radius:50%;
+  box-shadow:4px 4px 0 var(--ink); transition:transform .42s var(--ease-spring);
+}
+.lever-label{ font:700 8.5px/1.35 var(--font-m); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); text-align:center }
+.slot-controls{ display:flex; gap:12px; flex-wrap:wrap; margin-top:20px }
+.slot-stats{
+  margin-top:18px; display:flex; flex-wrap:wrap; gap:8px 18px;
+  font:400 10.5px/1.4 var(--font-m); color:var(--ink-soft);
+  text-transform:uppercase; letter-spacing:.08em;
+  border-top:2px dashed rgba(20,20,20,.25); padding-top:14px;
+}
+.slot-stats b{ color:var(--ink) }
+.slot-stats b.rank-legend{ background:var(--yellow); color:var(--ink); padding:1px 5px; border:1.5px solid var(--ink) }
+.slot-stats b.rank-rare{ color:var(--blue) }
+
+.luck-result{
+  position:relative; margin-bottom:18px; padding:14px 16px;
+  background:var(--paper-2); border:var(--line); box-shadow:var(--shadow-sm);
+  display:grid; gap:9px;
+}
+.luck-rank{
+  justify-self:start; font:700 10px/1 var(--font-m); letter-spacing:.14em; text-transform:uppercase;
+  border:2px solid var(--ink); padding:6px 10px; background:var(--paper);
+}
+.luck-rank.r-rare{ background:var(--blue); color:var(--paper); border-color:var(--blue) }
+.luck-rank.r-legend{ background:var(--yellow); animation:rankPulse .9s steps(2,start) infinite }
+@keyframes rankPulse{ 50%{ box-shadow:0 0 0 4px rgba(255,210,31,.45) } }
+.luck-line{ font:600 12.5px/1.75 var(--font-m); color:var(--ink) }
+.luck-line b{ color:var(--red) }
+
+@media (max-width:900px){
+  .slot-body{ flex-direction:column }
+  .slot-lever-wrap{ width:100%; flex-direction:row; gap:14px }
+  .slot-lever{ width:40px; height:110px }
+  .slot-lever .lv-rod{ top:12px }
+  .slot-lever .lv-knob{ width:38px; height:38px; margin-left:-19px }
+}
+
+/* ============ AG 图标美化 ============ */
+.ag-join{
+  position:relative; z-index:3; flex:none; width:clamp(24px,3.2vw,32px); aspect-ratio:1/1;
+  margin:0 -6px; background:var(--ink);
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);
+  animation:agJoinSpin 9s linear infinite;
+}
+@keyframes agJoinSpin{ to{ transform:rotate(360deg) } }
+.ag-word span{ position:relative; overflow:hidden }
+.ag-word span::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:radial-gradient(currentColor 1.7px, transparent 1.7px);
+  background-size:11px 11px; opacity:.2;
+}
+.ag-word span::after{
+  content:''; position:absolute; inset:9px; pointer-events:none;
+  border:2px solid currentColor; opacity:.4;
+}
+.loader-blocks span{ position:relative; overflow:hidden }
+.loader-blocks span::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:radial-gradient(currentColor 1.6px, transparent 1.6px);
+  background-size:10px 10px; opacity:.18;
+}
+.loader-blocks span::after{
+  content:''; position:absolute; inset:6px; pointer-events:none;
+  border:2px solid currentColor; opacity:.38;
+}
+.brand-mark{ padding:6px }
+.brand-mark svg{ display:block; width:100%; height:100% }
 </style>
 </head>
 <body>
@@ -1091,7 +1200,15 @@ ul{ list-style:none }
 <!-- 顶栏 -->
 <header class="topbar" id="topbar">
   <a class="brand" href="#home" aria-label="AG OC 俱乐部 回到顶部">
-    <span class="brand-mark" aria-hidden="true">A<em>G</em></span>
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3.5" y="3.5" width="41" height="41" stroke="#141414" stroke-width="1.4" stroke-dasharray="3 3" opacity="0.5"/>
+        <path d="M8.5 35L15 14L21.5 35" stroke="#141414" stroke-width="3"/>
+        <path d="M11.4 26.6H18.6" stroke="#141414" stroke-width="2.5"/>
+        <path d="M37.7 17.3A8.2 8.2 0 1 0 37.7 30.7" stroke="#FF4B2E" stroke-width="3.6" fill="none"/>
+        <path d="M33.2 24H40.6" stroke="#FF4B2E" stroke-width="3"/>
+      </svg>
+    </span>
     <span class="brand-txt"><b>AG · OC 俱乐部</b><em>一个让想法变成现实的地方</em></span>
   </a>
   <nav class="nav" aria-label="主导航">
@@ -1159,6 +1276,7 @@ ul{ list-style:none }
 
           <div class="ag-word" id="agWord" title="点我试试">
             <span class="ag-a" role="button" tabindex="0" aria-label="字母 A，点击有惊喜">A</span>
+            <i class="ag-join" aria-hidden="true"></i>
             <span class="ag-g" role="button" tabindex="0" aria-label="字母 G，点击有惊喜">G</span>
           </div>
 
@@ -1467,72 +1585,79 @@ ul{ list-style:none }
   <div class="wrap">
     <header class="sec-head reveal" style="--i:0">
       <div class="sec-head-main">
-        <span class="kicker"><i aria-hidden="true"></i>灵感发生器 / INSPIRE LAB</span>
-        <h2>给 AG 一句话，<br>它还你一张<span class="mark">粗野海报</span></h2>
-        <p class="lead">这不是真的 AI 出图——是浏览器本地绘制的灵感样本。但它会证明一件事：一个好点子，值得先被看见。</p>
+        <span class="kicker"><i aria-hidden="true"></i>灵感发生器 / LUCK MACHINE</span>
+        <h2>拉一下摇杆，<br>让机器替你<span class="mark">决定做什么</span></h2>
+        <p class="lead">三列齿轮随机咬合出「主题 × 媒介 × 风格」。摇到稀有组合时，彩带会先替你鼓掌——满意的组合，顺手就能压成一张海报。</p>
       </div>
       <div class="sec-head-index">SEC.<b>04</b></div>
     </header>
 
     <div class="lab-grid">
-      <div class="panel reveal" style="--i:1">
+      <div class="panel slot-panel reveal" style="--i:1">
         <div class="panel-title">
-          <span>INPUT / 输入台</span>
-          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>LUCK MACHINE / 灵感老虎机</span>
+          <span class="pt-right">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <button class="sound-btn" id="soundToggle" type="button" aria-pressed="true">SFX ON</button>
+          </span>
         </div>
 
-        <label class="field">
-          <span class="field-label"><b>01</b> / 你的灵感</span>
-          <input id="ideaInput" class="input" maxlength="20" placeholder="比如：用 AI 做一张校园乐队招募海报" autocomplete="off">
-        </label>
-
-        <div class="field">
-          <span class="field-label"><b>02</b> / 想要的形式</span>
-          <div class="chips" id="styleChips" role="group" aria-label="作品形式">
-            <button class="chip-btn is-on" data-style="poster" type="button">海报</button>
-            <button class="chip-btn" data-style="illust" type="button">插画</button>
-            <button class="chip-btn" data-style="code" type="button">代码</button>
-            <button class="chip-btn" data-style="video" type="button">短视频</button>
-            <button class="chip-btn" data-style="music" type="button">音乐</button>
+        <div class="slot-body">
+          <div class="slot-reels" id="slotReels" aria-label="灵感组合三列，摇动后随机组合"></div>
+          <div class="slot-lever-wrap">
+            <div class="slot-lever" id="slotLever" role="button" tabindex="0" aria-label="拉下摇杆，摇一次灵感">
+              <i class="lv-rod" aria-hidden="true"></i>
+              <i class="lv-knob" aria-hidden="true"></i>
+            </div>
+            <span class="lever-label">PULL<br>拉一下</span>
           </div>
         </div>
 
-        <div class="field">
-          <span class="field-label"><b>03</b> / 灵感浓度</span>
+        <div class="slot-controls">
+          <button class="btn btn-primary" id="generateBtn" type="button">
+            <span>摇一次灵感</span>
+            <svg class="arr" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <button class="btn" id="diceBtn" type="button" title="跳过滚动，直接开一个组合">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/></svg>
+            <span>直接开箱</span>
+          </button>
+        </div>
+
+        <div class="field" style="margin-top:22px; margin-bottom:0">
+          <span class="field-label"><b>POWER</b> / 灵感浓度（越浓，墨越多，稀有权重越高）</span>
           <div class="range-row">
             <input type="range" id="density" min="10" max="100" value="68" class="range" aria-label="灵感浓度">
           </div>
           <div class="range-scale"><span>朴素</span><span>炸裂</span></div>
         </div>
 
-        <div class="lab-actions">
-          <button class="btn btn-primary" id="generateBtn" type="button">
-            <span>把灵感变成作品</span>
-            <svg class="arr" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-          <button class="btn" id="diceBtn" type="button" title="随机一个灵感">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/></svg>
-            <span>换个灵感</span>
-          </button>
+        <div class="slot-stats" aria-live="polite">
+          <span>ROLLS / 已摇 <b id="luckRolls">0</b></span>
+          <span>WORKS / 产出 <b id="luckWorks">0</b></span>
+          <span>BEST / 最高 <b id="luckBest">—</b></span>
         </div>
-        <p class="tiny-note">TIP：把「灵感浓度」拉满再点生成，墨会溅得更有性格。所有绘制均在本地完成，不上传任何信息。</p>
       </div>
 
       <div class="lab-stage reveal" style="--i:2">
+        <div class="luck-result">
+          <span class="luck-rank r-common" id="luckRank">STANDBY / 待命</span>
+          <p class="luck-line" id="luckLine">拉动右边的摇杆，让三列齿轮替你决定：今天，做点什么。</p>
+        </div>
         <div class="artifact-frame">
-          <canvas id="artCanvas" width="640" height="840" aria-label="生成的灵感海报"></canvas>
+          <canvas id="artCanvas" width="640" height="840" aria-label="组合生成的海报"></canvas>
           <span class="artifact-badge" id="artBadge">AG · POSTER</span>
           <div class="gen-overlay" id="genOverlay" aria-hidden="true">
             <div class="gen-box">
               <div class="gen-blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-              <p>AG 正在把想法拼起来…</p>
+              <p>AG 正在把想法压成海报…</p>
             </div>
           </div>
         </div>
         <div class="artifact-info">
           <div class="type-out" id="typeOut"></div>
           <div class="artifact-tags" id="artTags">
-            <span>LOCAL-ONLY</span><span>NEO-BRUTAL</span><span>V1.4</span>
+            <span>LOCAL-ONLY</span><span>LUCK MACHINE</span><span>V2.0</span>
           </div>
         </div>
         <div class="artifact-actions">
@@ -1540,7 +1665,7 @@ ul{ list-style:none }
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg>
             <span>下载这张</span>
           </button>
-          <button class="btn btn-sm btn-ink" id="regenBtn" type="button">再抽一版</button>
+          <button class="btn btn-sm btn-ink" id="regenBtn" type="button">再摇一次</button>
         </div>
       </div>
     </div>
@@ -1666,7 +1791,15 @@ ul{ list-style:none }
   <div class="wrap">
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="brand-mark" aria-hidden="true">A<em>G</em></span>
+        <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3.5" y="3.5" width="41" height="41" stroke="#141414" stroke-width="1.4" stroke-dasharray="3 3" opacity="0.5"/>
+        <path d="M8.5 35L15 14L21.5 35" stroke="#141414" stroke-width="3"/>
+        <path d="M11.4 26.6H18.6" stroke="#141414" stroke-width="2.5"/>
+        <path d="M37.7 17.3A8.2 8.2 0 1 0 37.7 30.7" stroke="#FF4B2E" stroke-width="3.6" fill="none"/>
+        <path d="M33.2 24H40.6" stroke="#FF4B2E" stroke-width="3"/>
+      </svg>
+    </span>
         <div>
           <b style="font:900 18px/1.4 var(--font-d); color:var(--paper)">AG · OC 俱乐部</b>
           <p style="margin-top:8px">一个让想法变成现实的地方。用 AI，创造更多可能。页面里的一切作品与卡号，均由你的浏览器当场绘制。</p>
@@ -1943,16 +2076,20 @@ addEventListener('keydown', ev => { if(ev.key === 'Escape' && modal.classList.co
    灵感发生器 — 浏览器本地绘制新粗野主义海报
    ============================================================ */
 const artCanvas = $('#artCanvas'), actx = artCanvas.getContext('2d');
-const ideaInput = $('#ideaInput'), densityInput = $('#density');
+const densityInput = $('#density');
 const genOverlay = $('#genOverlay'), typeOut = $('#typeOut'), artBadge = $('#artBadge');
 const STYLE_LABEL = { poster: 'AG · POSTER', illust: 'AG · ILLUST', code: 'AG · CODE', video: 'AG · VIDEO', music: 'AG · MUSIC' };
-let curStyle = 'poster', artSeed = Date.now() % 99999;
+let artSeed = Date.now() % 99999;
+let lastIdea = '把想法拍在桌上', lastStyle = 'poster';
 
-const IDEAS = [
-  '用 AI 做一张校园乐队招募海报', '给流浪猫设计一个领养小程序',
-  '把期末复习笔记变成播客', '为宿舍楼画一套像素风门牌',
-  '生成一段 60 秒的城市漫游短片', '用 AI 给老照片上色并配乐',
-  '做一个会吐槽的周报生成器', '给社团招新拍一支赛博预告片'
+/* 三列齿轮：主题 × 媒介 × 风格 */
+const REELS = [
+  { label: '主题 TOPIC', items: ['流浪猫', '期末复习', '宿舍门牌', '校园乐队', '老照片', '社团招新', '城市夜景', '午夜食堂'] },
+  { label: '媒介 MEDIA', items: [
+      { t: '海报', s: 'poster' }, { t: '插画', s: 'illust' }, { t: '小程序', s: 'code' },
+      { t: '短片', s: 'video' }, { t: '播客', s: 'music' }, { t: '贴纸包', s: 'poster' }
+  ] },
+  { label: '风格 VIBE', items: ['赛博朋克', '像素风', '蒸汽波', '极简留白', '手绘涂鸦', '复古印刷', '故障艺术', '日系海报'] }
 ];
 
 /* CJK 感知的换行 */
@@ -1979,11 +2116,14 @@ function drawStar(ctx, x, y, r, color){
   ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
 }
 
-function drawPoster(){
+function drawPoster(ideaText, styleKey){
+  if(ideaText !== undefined && ideaText !== null && ideaText !== '') lastIdea = String(ideaText);
+  if(styleKey) lastStyle = styleKey;
   const W = artCanvas.width, H = artCanvas.height;
   const rng = mulberry32(artSeed);
   const density = +densityInput.value;
-  const idea = (ideaInput.value.trim() || '把想法拍在桌上').slice(0, 20);
+  const idea = (lastIdea.trim() || '把想法拍在桌上').slice(0, 20);
+  const style = lastStyle;
   const rrand = (a, b) => a + rng() * (b - a);
 
   /* 底色 + 纸面 */
@@ -2012,7 +2152,7 @@ function drawPoster(){
   actx.fillStyle = '#3A3831';
   actx.fillText('INSPIRE LAB / NO.' + String(artSeed).padStart(5, '0'), 52, 222);
 
-  const label = STYLE_LABEL[curStyle];
+  const label = STYLE_LABEL[style];
   actx.font = '700 15px ' + FONT_M;
   const lw = actx.measureText(label).width + 28;
   actx.fillStyle = YELLOW; actx.fillRect(W - 52 - lw, 182, lw, 36);
@@ -2051,7 +2191,7 @@ function drawPoster(){
   actx.save();
   actx.translate(0, 380);
   const cy = ty - 340 - 40;
-  if(curStyle === 'poster'){
+  if(style === 'poster'){
     const shapes = ['sq', 'ci', 'tri'];
     for(let i = 0; i < 3; i++) for(let j = 0; j < 4; j++){
       const x = 80 + j * 128, y = cy + i * 74, s = shapes[(i + j) % 3];
@@ -2060,7 +2200,7 @@ function drawPoster(){
       else if(s === 'ci'){ actx.fillStyle = (i + j) % 2 ? RED : PAPER; actx.beginPath(); actx.arc(x + 26, y + 26, 27, 0, Math.PI * 2); actx.fill(); actx.stroke(); }
       else{ actx.fillStyle = INK; actx.beginPath(); actx.moveTo(x, y + 52); actx.lineTo(x + 26, y); actx.lineTo(x + 52, y + 52); actx.closePath(); actx.fill(); }
     }
-  }else if(curStyle === 'illust'){
+  }else if(style === 'illust'){
     const cx2 = W / 2, cyy = cy + 60;
     actx.lineWidth = 5; actx.strokeStyle = INK;
     actx.fillStyle = YELLOW; actx.beginPath(); actx.arc(cx2, cyy, 92, 0, Math.PI * 2); actx.fill(); actx.stroke();
@@ -2073,7 +2213,7 @@ function drawPoster(){
     actx.lineWidth = 5; actx.strokeStyle = INK;
     actx.beginPath(); actx.arc(cx2, cyy + 18, 34, .25, Math.PI - .25); actx.stroke();
     drawStar(actx, cx2 + 150, cyy - 70, 26, RED);
-  }else if(curStyle === 'code'){
+  }else if(style === 'code'){
     const bx = 70, by = cy, bw = W - 140, bh = 190;
     actx.fillStyle = INK; actx.fillRect(bx, by, bw, bh);
     actx.fillStyle = YELLOW; actx.fillRect(bx, by, bw, 34);
@@ -2083,7 +2223,7 @@ function drawPoster(){
     actx.font = '400 15px ' + FONT_M; actx.fillStyle = PAPER;
     const codeLines = ['$ ag run "' + idea.slice(0, 6) + '"', '  ▸ parsing idea ......... ok', '  ▸ remixing layout ...... ok', '  ▸ SHIPPED in 1.2s ✦'];
     codeLines.forEach((l, i) => actx.fillText(l, bx + 18, by + 62 + i * 30));
-  }else if(curStyle === 'video'){
+  }else if(style === 'video'){
     const cx2 = W / 2, cyy = cy + 70;
     actx.lineWidth = 6; actx.strokeStyle = INK; actx.fillStyle = BLUE;
     actx.beginPath(); actx.arc(cx2, cyy, 84, 0, Math.PI * 2); actx.fill(); actx.stroke();
@@ -2146,50 +2286,230 @@ function typeWriter(text){
   }, 34);
 }
 
-/* 形式切换 */
-$$('#styleChips .chip-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    $$('#styleChips .chip-btn').forEach(b => b.classList.remove('is-on'));
-    btn.classList.add('is-on');
-    curStyle = btn.dataset.style;
-    artBadge.textContent = STYLE_LABEL[curStyle];
-    generateArt(false);
-  });
-});
+/* === 老虎机：构建三列 === */
+const IH = 68;
+const slotReels = $('#slotReels');
+let cols = [], spinning = false;
 
-/* 生成流程（带加载态） */
-let genBusy = false;
-function generateArt(withFx){
-  if(genBusy) return;
-  genBusy = true;
-  if(withFx){ artSeed = Math.floor(Math.random() * 99999); }
-  genOverlay.classList.add('is-on');
-  genOverlay.setAttribute('aria-hidden', 'false');
-  setTimeout(() => {
-    drawPoster();
-    genOverlay.classList.remove('is-on');
-    genOverlay.setAttribute('aria-hidden', 'true');
-    genBusy = false;
-    typeWriter('DONE ✓ ' + (ideaInput.value.trim() || '把想法拍在桌上') + ' → ' + $('#styleChips .chip-btn.is-on').textContent + '样本');
-    toast('灵感样本已生成 · 全部在本地绘制');
-    const r = $('#generateBtn').getBoundingClientRect();
-    burst(r.left + r.width / 2, r.top, 26);
-  }, withFx ? 700 : 240);
+function buildReels(){
+  slotReels.innerHTML = '';
+  cols = REELS.map(r => {
+    const colEl = document.createElement('div');
+    colEl.className = 'reel-col';
+    const label = document.createElement('span');
+    label.className = 'reel-label';
+    label.textContent = r.label;
+    const reel = document.createElement('div');
+    reel.className = 'reel';
+    const track = document.createElement('div');
+    track.className = 'reel-track';
+    let html = '';
+    for(let k = 0; k < 5; k++){
+      r.items.forEach(it => {
+        html += '<div class="reel-item">' + (typeof it === 'string' ? it : it.t) + '</div>';
+      });
+    }
+    track.innerHTML = html;
+    reel.appendChild(track);
+    colEl.appendChild(label);
+    colEl.appendChild(reel);
+    slotReels.appendChild(colEl);
+    const idx = Math.floor(Math.random() * r.items.length);
+    track.style.transform = 'translateY(' + (IH - idx * IH) + 'px)';
+    return { el: reel, track, items: r.items, index: idx };
+  });
 }
 
-$('#generateBtn').addEventListener('click', () => generateArt(true));
-$('#regenBtn').addEventListener('click', () => generateArt(true));
-$('#diceBtn').addEventListener('click', () => {
-  ideaInput.value = pick(IDEAS.filter(i => i !== ideaInput.value));
-  generateArt(true);
+function spinReel(col, target, dur){
+  const n = col.items.length;
+  col.track.style.transition = 'none';
+  col.track.style.transform = 'translateY(' + (IH - col.index * IH) + 'px)';
+  void col.track.offsetHeight;
+  const steps = ((target - col.index + n) % n) + n * 2;
+  col.track.style.transition = 'transform ' + dur + 'ms cubic-bezier(.12,.9,.16,1)';
+  col.track.style.transform = 'translateY(' + (IH - col.index * IH - steps * IH) + 'px)';
+  setTimeout(() => {
+    col.track.style.transition = 'none';
+    col.index = target;
+    col.track.style.transform = 'translateY(' + (IH - target * IH) + 'px)';
+    col.el.classList.add('is-hit');
+    setTimeout(() => col.el.classList.remove('is-hit'), 460);
+    tickSound(480 + Math.random() * 160);
+  }, dur + 30);
+}
+
+/* === 音效（WebAudio 合成，无外部资源）=== */
+let audioCtx = null, soundOn = true;
+function ensureAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+  }
+  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+  return audioCtx;
+}
+function tickSound(freq){
+  if(!soundOn) return;
+  const ac = ensureAudio(); if(!ac) return;
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'square'; o.frequency.value = freq;
+  g.gain.setValueAtTime(.04, ac.currentTime);
+  g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + .09);
+  o.connect(g); g.connect(ac.destination);
+  o.start(); o.stop(ac.currentTime + .1);
+}
+function chimeSound(rank){
+  if(!soundOn) return;
+  const ac = ensureAudio(); if(!ac) return;
+  const notes = rank === 'LEGEND' ? [523, 659, 784, 1047] : rank === 'RARE' ? [523, 659, 784] : [392, 523];
+  notes.forEach((f, i) => setTimeout(() => {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(.05, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + .32);
+    o.connect(g); g.connect(ac.destination);
+    o.start(); o.stop(ac.currentTime + .34);
+  }, i * 90));
+}
+
+/* === 稀有度与统计 === */
+function rollRank(){
+  const power = +densityInput.value;
+  const h = Math.random() * 100;
+  const legendLine = 4 + power / 20;
+  const rareLine = legendLine + 20 + power / 6;
+  if(h < legendLine) return 'LEGEND';
+  if(h < rareLine) return 'RARE';
+  return 'COMMON';
+}
+const RANK_TEXT = { COMMON: 'COMMON / 普通', RARE: 'RARE / 稀有', LEGEND: 'LEGEND / 传说' };
+const RANK_ORDER = { '—': 0, COMMON: 1, RARE: 2, LEGEND: 3 };
+const STAT_KEY = 'ag_luck_stats';
+let stats = { rolls: 0, works: 0, best: '—' };
+try{
+  const raw = localStorage.getItem(STAT_KEY);
+  if(raw) stats = Object.assign(stats, JSON.parse(raw));
+}catch(e){}
+function saveStats(){
+  try{ localStorage.setItem(STAT_KEY, JSON.stringify(stats)); }catch(e){}
+}
+function renderStats(){
+  $('#luckRolls').textContent = stats.rolls;
+  $('#luckWorks').textContent = stats.works;
+  const bestEl = $('#luckBest');
+  bestEl.textContent = stats.best;
+  bestEl.className = stats.best === 'LEGEND' ? 'rank-legend' : stats.best === 'RARE' ? 'rank-rare' : '';
+}
+
+/* === 结算：组合成句 + 生成海报 === */
+function settle(){
+  const topic = cols[0].items[cols[0].index];
+  const media = cols[1].items[cols[1].index];
+  const vibe = cols[2].items[cols[2].index];
+  const mediaName = typeof media === 'string' ? media : media.t;
+  const styleKey = typeof media === 'string' ? 'poster' : media.s;
+  const combo = topic + '×' + mediaName + '·' + vibe;
+  const rank = rollRank();
+
+  stats.rolls++;
+  stats.works++;
+  if(RANK_ORDER[rank] > RANK_ORDER[stats.best]) stats.best = rank;
+  saveStats();
+  renderStats();
+
+  const rankEl = $('#luckRank');
+  rankEl.textContent = RANK_TEXT[rank];
+  rankEl.className = 'luck-rank r-' + rank.toLowerCase();
+  $('#luckLine').innerHTML = '把「<b>' + topic + '</b>」做成「<b>' + mediaName + '</b>」，风格要「<b>' + vibe + '</b>」。';
+
+  artSeed = Math.floor(Math.random() * 99999);
+  artBadge.textContent = STYLE_LABEL[styleKey];
+  genOverlay.classList.add('is-on');
+  genOverlay.setAttribute('aria-hidden', 'false');
+  chimeSound(rank);
+
+  setTimeout(() => {
+    drawPoster(combo, styleKey);
+    genOverlay.classList.remove('is-on');
+    genOverlay.setAttribute('aria-hidden', 'true');
+    typeWriter('ROLL #' + stats.rolls + ' → ' + combo + ' · ' + rank);
+    const r = $('#luckResult').getBoundingClientRect();
+    if(rank === 'LEGEND'){
+      burst(innerWidth / 2, innerHeight * .4, 110);
+      setTimeout(() => burst(innerWidth * .2, innerHeight * .45, 60), 170);
+      setTimeout(() => burst(innerWidth * .8, innerHeight * .45, 60), 310);
+      toast('传说级组合！这台机器今天很给面子');
+    }else if(rank === 'RARE'){
+      burst(r.left + r.width / 2, r.top + 26, 42);
+      toast('稀有组合，值得做成作品');
+    }else{
+      toast('灵感已落袋 · 不满意就再摇一次');
+    }
+  }, rank === 'LEGEND' ? 860 : 480);
+}
+
+/* === 摇动 === */
+function triggerSpin(instant){
+  if(spinning) return;
+  spinning = true;
+  const targets = cols.map(c => Math.floor(Math.random() * c.items.length));
+  const dur = instant ? [420, 520, 620] : [980, 1150, 1400];
+  cols.forEach((c, i) => spinReel(c, targets[i], dur[i]));
+  tickSound(280);
+  setTimeout(() => { spinning = false; settle(); }, dur[2] + 150);
+}
+
+/* === 物理摇杆 === */
+const lever = $('#slotLever'), knob = lever.querySelector('.lv-knob');
+let pulling = false, pullStart = 0, pullDy = 0;
+lever.addEventListener('pointerdown', ev => {
+  if(spinning) return;
+  pulling = true; pullStart = ev.clientY; pullDy = 0;
+  lever.classList.add('is-pulling');
+  try{ lever.setPointerCapture(ev.pointerId); }catch(e){}
 });
+lever.addEventListener('pointermove', ev => {
+  if(!pulling) return;
+  pullDy = clamp(ev.clientY - pullStart, 0, 104);
+  knob.style.transition = 'none';
+  knob.style.transform = 'translateY(' + pullDy + 'px)';
+});
+function endPull(){
+  if(!pulling) return;
+  pulling = false;
+  lever.classList.remove('is-pulling');
+  knob.style.transition = '';
+  knob.style.transform = '';
+  const fired = pullDy > 50;
+  pullDy = 0;
+  if(fired) triggerSpin(false);
+}
+lever.addEventListener('pointerup', endPull);
+lever.addEventListener('pointercancel', endPull);
+lever.addEventListener('keydown', ev => {
+  if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); triggerSpin(false); }
+});
+
+/* === 绑定与初始化 === */
+$('#generateBtn').addEventListener('click', () => triggerSpin(false));
+$('#regenBtn').addEventListener('click', () => triggerSpin(false));
+$('#diceBtn').addEventListener('click', () => triggerSpin(true));
 $('#downloadBtn').addEventListener('click', () => {
   const a = document.createElement('a');
-  a.download = 'AG-inspire-' + artSeed + '.png';
+  a.download = 'AG-luck-' + artSeed + '.png';
   a.href = artCanvas.toDataURL('image/png');
   a.click();
   toast('海报已保存到你的下载文件夹');
 });
+$('#soundToggle').addEventListener('click', ev => {
+  soundOn = !soundOn;
+  ev.currentTarget.setAttribute('aria-pressed', String(soundOn));
+  ev.currentTarget.textContent = soundOn ? 'SFX ON' : 'SFX OFF';
+  if(soundOn) tickSound(660);
+});
+
+buildReels();
+renderStats();
+drawPoster();
 
 /* ============================================================
    贴纸工作台 — 拖拽 / 双击旋转 / 惯性
@@ -2199,7 +2519,7 @@ const STICKERS = [
   { t: 'IDEA → 作品', c: 's-y', r: -4, w: 150 },
   { t: 'AG · 01', c: 's-k', r: 3, w: 96 },
   { t: 'SHIP IT!', c: 's-b', r: -2, w: 118 },
-  { t: '灵感浓度 68%', c: 's-m', r: 1.5, w: 148 },
+  { t: '灵感浓度 683', c: 's-m', r: 1.5, w: 148 },
   { t: '动手第一', c: 's-r', r: -3, w: 122 },
   { t: 'AI × ME', c: '', r: 2, w: 104 },
   { t: 'OC CLUB', c: 's-m', r: -1, w: 108 },
@@ -2382,11 +2702,14 @@ function drawCardFront(){
   mctx.font = '700 15px ' + FONT_M;
   mctx.fillText('MEMBER CARD', 44, 78 + 18);
 
-  /* 右上：AG 方块标 */
-  mctx.fillStyle = INK; mctx.fillRect(W - 150, 34, 92, 52);
-  mctx.fillStyle = YELLOW; mctx.font = '900 30px ' + FONT_D;
-  mctx.textAlign = 'center'; mctx.fillText('AG', W - 104, 62);
+  /* 右上：AG 徽标块（黄底 / A 墨 / G 红）*/
+  mctx.fillStyle = YELLOW; mctx.fillRect(W - 150, 34, 92, 52);
+  mctx.lineWidth = 3; mctx.strokeStyle = INK;
+  mctx.strokeRect(W - 150, 34, 92, 52);
+  mctx.font = '900 30px ' + FONT_D;
   mctx.textAlign = 'left';
+  mctx.fillStyle = INK; mctx.fillText('A', W - 140, 62);
+  mctx.fillStyle = RED; mctx.fillText('G', W - 118, 62);
 
   /* 名字区 */
   mctx.font = '700 14px ' + FONT_M; mctx.fillStyle = '#3A3831';
