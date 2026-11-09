@@ -1,437 +1,2896 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AG · OC 俱乐部 — 用 AI，创造更多可能</title>
-<meta name="description" content="OC 俱乐部 · AG —— 一个让想法变成现实的地方。用 AI，创造更多可能。">
-<meta name="theme-color" content="#fff8ed">
-<link rel="stylesheet" href="styles.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff5fa2'/%3E%3Cstop offset='.5' stop-color='%23ffc857'/%3E%3Cstop offset='1' stop-color='%2335d0e0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230b1130'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='32' font-weight='900' text-anchor='middle' fill='url(%23g)'%3EAG%3C/text%3E%3C/svg%3E">
+<meta name="description" content="OC 俱乐部 · AG —— 一个让想法变成现实的地方。新粗野主义 × 创意科技，用 AI，创造更多可能。">
+<meta name="theme-color" content="#F1EEE3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFD21F' stroke='%23141414' stroke-width='6'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='30' font-weight='900' text-anchor='middle' fill='%23FF4B2E'%3EAG%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   AG · OC CLUB — NEO-BRUTALIST CREATIVE TECH
+   纸底 / 墨线 / 硬阴影 / 电光黄 —— 单文件，零依赖
+   ============================================================ */
+
+/* === Design Tokens === */
+:root{
+  --paper:   #F1EEE3;
+  --paper-2: #FBF9F2;
+  --ink:     #141414;
+  --ink-soft:#3A3831;
+  --yellow:  #FFD21F;
+  --blue:    #2544E8;
+  --red:     #FF4B2E;
+  --cyan:    #19B8A6;
+  --border-w: 3px;
+  --bw: var(--border-w);
+  --line: var(--bw) solid var(--ink);
+  --line-2: 2px solid var(--ink);
+  --shadow:    8px 8px 0 var(--ink);
+  --shadow-sm: 5px 5px 0 var(--ink);
+  --shadow-lg: 12px 12px 0 var(--ink);
+  --shadow-y:  8px 8px 0 var(--yellow);
+  --shadow-b:  8px 8px 0 var(--blue);
+  --font-d: 'Archivo Black','Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  --font-b: 'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  --font-m: 'Space Mono','SFMono-Regular',Consolas,'Microsoft YaHei',monospace;
+  --ease-spring: cubic-bezier(.16,1,.3,1);
+}
+
+/* === Reset / Base === */
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0 }
+html{ scroll-behavior:smooth }
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-b);
+  font-size:16px;
+  line-height:1.75;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{ background:var(--yellow); color:var(--ink) }
+img{ display:block; max-width:100% }
+a{ color:inherit; text-decoration:none }
+button{ font:inherit; color:inherit; cursor:pointer; background:none; border:none }
+ul{ list-style:none }
+:focus-visible{ outline:3px dashed var(--blue); outline-offset:3px }
+
+/* 方形滚动条 */
+::-webkit-scrollbar{ width:14px; height:14px }
+::-webkit-scrollbar-track{ background:var(--paper); border-left:var(--line-2) }
+::-webkit-scrollbar-thumb{ background:var(--ink); border:3px solid var(--paper) }
+
+/* === 噪点层（固定，不参与滚动重绘）=== */
+.noise{
+  position:fixed; inset:0; z-index:2000; pointer-events:none; opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* === 启动界面 / BOOT SCREEN === */
+.loader{
+  position:fixed; inset:0; z-index:3000; background:var(--yellow);
+  display:grid; place-items:center; overflow:hidden;
+  transition:transform .6s cubic-bezier(.7,0,.2,1);
+}
+.loader.is-done{ transform:translateY(-101%); transition-delay:.55s }
+.loader::before{
+  content:''; position:absolute; inset:0;
+  background-image:radial-gradient(rgba(20,20,20,.18) 1.6px, transparent 1.6px);
+  background-size:14px 14px; opacity:.5;
+}
+.loader-grid{
+  position:absolute; inset:0;
+  background:
+    linear-gradient(var(--ink) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--ink) 1.5px, transparent 1.5px);
+  background-size:56px 56px; opacity:.12;
+}
+.loader-inner{
+  position:relative; z-index:3; width:min(520px,88vw);
+  display:flex; flex-direction:column; align-items:center; gap:20px;
+  transition:opacity .28s ease, transform .28s ease;
+}
+.loader.is-done .loader-inner{ opacity:0; transform:scale(.96) }
+.ld-meta{
+  width:100%; display:flex; justify-content:space-between; gap:12px;
+  font:700 10.5px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase;
+  border-bottom:2px solid var(--ink); padding-bottom:10px;
+}
+.loader-blocks{ display:flex; align-items:center; gap:14px }
+.loader-blocks span{
+  width:clamp(64px,9.5vw,92px); aspect-ratio:1/1;
+  display:grid; place-items:center;
+  border:3px solid var(--ink); box-shadow:8px 8px 0 var(--ink);
+  font:900 clamp(34px,4.6vw,50px)/1 var(--font-d);
+  animation:ldIn .6s var(--ease-spring) both;
+}
+.loader-blocks span:first-child{ background:var(--yellow); color:var(--ink); animation-name:ldInL }
+.loader-blocks span:last-child{ background:var(--red); color:var(--paper); box-shadow:-8px 8px 0 var(--ink); animation-name:ldInR }
+@keyframes ldInL{ from{ transform:translate(-70px,-26px) rotate(-14deg); opacity:0 } to{ transform:translate(0,0) rotate(-3deg); opacity:1 } }
+@keyframes ldInR{ from{ transform:translate(70px,-26px) rotate(14deg); opacity:0 } to{ transform:translate(0,0) rotate(2.5deg); opacity:1 } }
+.ld-plus{
+  width:16px; height:16px; flex:none;
+  background:
+    linear-gradient(var(--ink), var(--ink)) center / 100% 3px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) center / 3px 100% no-repeat;
+  animation:ldSpin 5s linear infinite;
+}
+@keyframes ldSpin{ to{ transform:rotate(405deg) } }
+.loader-meter{ width:100%; display:flex; align-items:center; gap:12px }
+.loader-bar{
+  position:relative; flex:1; height:20px; overflow:hidden;
+  border:3px solid var(--ink); background:var(--paper-2); box-shadow:5px 5px 0 var(--ink);
+}
+.loader-bar i{ display:block; height:100%; width:0; background:var(--red); border-right:3px solid var(--ink); transition:width .18s linear }
+.loader-bar::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(-45deg, rgba(20,20,20,.14) 0 6px, transparent 6px 12px);
+}
+.loader-meter b{
+  font:900 24px/1 var(--font-d); min-width:2.3em; text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.loader-meter b::after{ content:'%'; font-size:.55em; margin-left:1px }
+.loader-text{ font:700 13px/1.5 var(--font-m); letter-spacing:.12em; text-transform:uppercase; text-align:center; min-height:1.5em }
+.loader-sub{ font:400 10.5px/1.7 var(--font-m); letter-spacing:.14em; text-transform:uppercase; color:#5d5a4e; text-align:center }
+.loader-foot{
+  position:absolute; left:0; right:0; bottom:24px; z-index:3;
+  display:flex; justify-content:center; align-items:center; gap:14px;
+  font:700 10px/1 var(--font-m); letter-spacing:.22em; text-transform:uppercase;
+}
+.loader-foot i{ width:9px; height:9px; background:var(--ink); transform:rotate(45deg) }
+.ld-corner{ position:absolute; z-index:2; width:24px; height:24px; border:3px solid var(--ink) }
+.ld-corner.c1{ top:22px; left:22px; background:var(--red) }
+.ld-corner.c2{ top:22px; right:22px; background:var(--paper-2) }
+.ld-corner.c3{ bottom:22px; left:22px; background:var(--paper-2) }
+.ld-corner.c4{ bottom:22px; right:22px; background:var(--ink) }
+.loader-deco{ position:absolute; inset:0; z-index:1; pointer-events:none }
+.ld-ringwrap{ position:absolute; left:50%; top:50%; width:min(420px,74vw); aspect-ratio:1/1; transform:translate(-50%,-50%) }
+.ld-ring{ display:block; width:100%; height:100%; border:3px dashed rgba(20,20,20,.3); border-radius:50%; animation:ldSpin 22s linear infinite }
+.ld-star{ position:absolute; width:13px; height:13px; clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%); animation:bob 3.4s ease-in-out infinite alternate }
+.ld-star.s1{ left:16%; top:20%; background:var(--ink) }
+.ld-star.s2{ left:76%; top:66%; background:var(--red); animation-delay:.6s }
+.ld-star.s3{ left:22%; top:74%; background:var(--blue); animation-delay:1.2s; width:9px; height:9px }
+.curtain{ position:absolute; inset:0; z-index:4; pointer-events:none; overflow:hidden }
+.curtain i{ position:absolute; inset:0; transform:translateY(101%) }
+.curtain i:nth-child(1){ background:var(--red) }
+.curtain i:nth-child(2){ background:var(--ink) }
+.curtain i:nth-child(3){ background:var(--yellow) }
+.loader.is-done .curtain i{ transform:translateY(0); transition:transform .52s cubic-bezier(.7,0,.2,1) }
+.loader.is-done .curtain i:nth-child(1){ transition-delay:0s }
+.loader.is-done .curtain i:nth-child(2){ transition-delay:.06s }
+.loader.is-done .curtain i:nth-child(3){ transition-delay:.12s }
+@media (max-width:640px){
+  .loader-inner{ gap:16px }
+  .ld-meta{ font-size:9.5px; letter-spacing:.1em }
+  .loader-foot{ gap:10px; font-size:9px }
+}
+
+/* === 进度条 & 顶栏 === */
+.progress{ position:fixed; top:0; left:0; right:0; height:7px; z-index:1500; background:transparent; border-bottom:var(--line-2); pointer-events:none }
+.progress i{ display:block; height:100%; width:0; background:var(--yellow); border-right:var(--line-2) }
+
+.topbar{
+  position:sticky; top:0; z-index:1000;
+  background:var(--paper); border-bottom:var(--line);
+  display:flex; align-items:center; gap:18px;
+  padding:12px clamp(16px,4vw,44px);
+  transition:box-shadow .3s;
+}
+.topbar.is-scrolled{ box-shadow:0 6px 0 rgba(20,20,20,.12) }
+.brand{ display:flex; align-items:center; gap:12px; flex-shrink:0 }
+.brand-mark{
+  width:46px; height:46px; background:var(--yellow); border:var(--line);
+  display:grid; place-items:center; font:900 20px/1 var(--font-d);
+  box-shadow:4px 4px 0 var(--ink); transition:transform .25s var(--ease-spring), box-shadow .25s var(--ease-spring);
+}
+.brand-mark em{ font-style:normal; color:var(--red) }
+.brand:hover .brand-mark{ transform:translate(-2px,-2px) rotate(-3deg); box-shadow:6px 6px 0 var(--ink) }
+.brand-txt{ display:flex; flex-direction:column; line-height:1.2 }
+.brand-txt b{ font:900 17px/1.2 var(--font-d) }
+.brand-txt em{ font:400 11px/1.4 var(--font-m); font-style:normal; color:var(--ink-soft) }
+
+.nav{ display:flex; gap:4px; margin-left:auto; flex-wrap:wrap }
+.nav-link{
+  position:relative; font:700 12px/1 var(--font-m); letter-spacing:.08em;
+  padding:10px 13px; border:2px solid transparent; text-transform:uppercase;
+  transition:background .2s, border-color .2s, transform .2s var(--ease-spring);
+}
+.nav-link:hover{ border-color:var(--ink); background:var(--paper-2); transform:translateY(-2px) }
+.nav-link.is-active{ background:var(--ink); color:var(--yellow); border-color:var(--ink) }
+.top-actions{ display:flex; gap:12px; align-items:center }
+@media (max-width:1024px){ .nav{ display:none } }
+@media (max-width:640px){ .brand-txt{ display:none } .top-actions .btn-ghost{ display:none } }
+
+/* === 按钮（硬阴影物理按压）=== */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  font:700 14px/1 var(--font-m); letter-spacing:.04em; text-transform:uppercase;
+  padding:14px 22px; border:var(--line); background:var(--paper-2);
+  box-shadow:var(--shadow-sm);
+  transition:transform .18s var(--ease-spring), box-shadow .18s var(--ease-spring), background .18s;
+  user-select:none;
+}
+.btn:hover{ transform:translate(-3px,-3px); box-shadow:var(--shadow) }
+.btn:active{ transform:translate(4px,4px); box-shadow:0 0 0 var(--ink) }
+.btn-primary{ background:var(--yellow) }
+.btn-ink{ background:var(--ink); color:var(--paper) }
+.btn-sm{ padding:10px 15px; font-size:12px; box-shadow:4px 4px 0 var(--ink) }
+.btn-lg{ padding:19px 34px; font-size:16px; box-shadow:var(--shadow) }
+.btn .arr{ display:inline-block; transition:transform .25s var(--ease-spring) }
+.btn:hover .arr{ transform:translateX(5px) }
+.btn svg{ flex-shrink:0 }
+
+/* === 通用区块 === */
+.wrap{ width:min(1280px,100% - clamp(32px,7vw,96px)); margin-inline:auto }
+.section{ padding:clamp(72px,9vw,128px) 0; position:relative }
+.section + .section{ border-top:var(--line) }
+.sec-head{ margin-bottom:clamp(36px,5vw,64px); display:flex; flex-wrap:wrap; align-items:flex-end; gap:24px 40px }
+.sec-head-main{ flex:1 1 420px }
+.sec-head-index{ font:700 12px/1 var(--font-m); letter-spacing:.12em; color:var(--ink-soft); text-align:right; padding-bottom:14px }
+.sec-head-index b{ display:block; font-size:30px; color:var(--ink); margin-top:6px }
+.kicker{
+  display:inline-flex; align-items:center; gap:8px;
+  font:700 12px/1 var(--font-m); letter-spacing:.14em; text-transform:uppercase;
+  background:var(--ink); color:var(--paper); padding:8px 14px; margin-bottom:18px;
+}
+.kicker i{ width:9px; height:9px; background:var(--yellow); display:inline-block }
+.sec-head h2{ font:900 clamp(34px,5.2vw,62px)/1.12 var(--font-d); letter-spacing:-.01em; text-transform:none }
+.mark{ position:relative; display:inline-block; padding:0 .14em; background:var(--yellow); border:var(--line-2); box-shadow:4px 4px 0 var(--ink); transform:rotate(-1.2deg) }
+.mark-blue{ background:var(--blue); color:var(--paper) }
+.lead{ margin-top:18px; max-width:60ch; color:var(--ink-soft); font-size:15.5px }
+
+/* === 滚动显现（staggered）=== */
+.reveal{ opacity:0; transform:translateY(26px); transition:opacity .6s var(--ease-spring), transform .6s var(--ease-spring); transition-delay:calc(var(--i,0)*90ms) }
+.reveal.is-in{ opacity:1; transform:none }
+@media (prefers-reduced-motion:reduce){
+  .reveal{ opacity:1; transform:none; transition:none }
+  *,*::before,*::after{ animation-duration:.001s !important; animation-iteration-count:1 !important }
+}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative; min-height:100vh; min-height:100dvh;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:clamp(60px,8vh,110px) 0 clamp(40px,6vh,72px);
+  background:
+    linear-gradient(var(--ink) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--ink) 1.5px, transparent 1.5px);
+  background-size:56px 56px;
+  background-position:center top;
+  background-color:var(--paper);
+  background-blend-mode:normal;
+  overflow:hidden;
+}
+/* 网格线降低存在感 */
+.hero::before{ content:''; position:absolute; inset:0; background:var(--paper); opacity:.82; pointer-events:none }
+.hero > .wrap{ position:relative; z-index:2 }
+
+.hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(36px,5vw,72px); align-items:center }
+@media (max-width:900px){ .hero-grid{ grid-template-columns:1fr } }
+
+.hero-tags{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:26px }
+.tag{
+  display:inline-flex; align-items:center; gap:8px;
+  font:700 11.5px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+  border:var(--line-2); padding:8px 12px; background:var(--paper-2);
+}
+.tag-y{ background:var(--yellow) }
+.tag-b{ background:var(--blue); color:var(--paper) }
+.tag-r{ background:var(--red); color:var(--paper) }
+
+.hero h1{
+  font:900 clamp(44px,7.2vw,104px)/1.04 var(--font-d);
+  letter-spacing:-.015em; text-transform:none;
+}
+.hero h1 .row{ display:block }
+.hero h1 .slant{ display:inline-block; transform:rotate(-2deg) }
+.hl-y{ background:var(--yellow); border:var(--line); box-shadow:6px 6px 0 var(--ink); padding:0 .12em; display:inline-block; transform:rotate(-1.5deg) }
+.hl-i{ background:var(--ink); color:var(--paper); padding:0 .12em; display:inline-block; transform:rotate(1.2deg) }
+.hero-sub{ margin-top:26px; max-width:46ch; font-size:clamp(15px,1.6vw,18px); color:var(--ink-soft) }
+.hero-sub b{ color:var(--ink); background:var(--paper-2); border:var(--line-2); padding:1px 7px; font-family:var(--font-m); font-size:.92em }
+
+.hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-top:36px }
+
+.hero-stats{
+  margin-top:44px; display:flex; border:var(--line); background:var(--paper-2);
+  box-shadow:var(--shadow); width:fit-content; max-width:100%;
+}
+.hstat{ padding:16px 26px; border-right:var(--line-2); min-width:120px }
+.hstat:last-child{ border-right:none }
+.hstat b{ display:block; font:900 26px/1.1 var(--font-d); font-variant-numeric:tabular-nums }
+.hstat span{ font:400 11px/1.5 var(--font-m); color:var(--ink-soft); text-transform:uppercase; letter-spacing:.08em }
+@media (max-width:640px){ .hero-stats{ flex-wrap:wrap } .hstat{ flex:1 1 45%; border-bottom:var(--line-2) } }
+
+/* HERO 右侧：AG 巨字舞台 */
+.stage{ position:relative; display:grid; place-items:center; min-height:420px }
+.stage-panel{
+  position:relative; width:min(460px,100%); aspect-ratio:1/1.06;
+  background:var(--paper-2); border:var(--line); box-shadow:var(--shadow-lg);
+  transform:rotate(1.6deg);
+  display:grid; place-items:center; overflow:hidden;
+}
+.stage-panel::before{ /* 半调网点 */
+  content:''; position:absolute; inset:0;
+  background-image:radial-gradient(var(--ink) 1.8px, transparent 1.8px);
+  background-size:15px 15px; opacity:.14;
+}
+.ag-word{ position:relative; z-index:2; display:flex; gap:12px }
+.ag-word span{
+  width:clamp(120px,26vw,180px); aspect-ratio:1/1;
+  display:grid; place-items:center;
+  font:900 clamp(64px,13vw,96px)/1 var(--font-d);
+  border:var(--line); transition:transform .3s var(--ease-spring), box-shadow .3s var(--ease-spring);
+  cursor:pointer; user-select:none;
+}
+.ag-a{ background:var(--yellow); transform:rotate(-3deg); box-shadow:7px 7px 0 var(--ink) }
+.ag-g{ background:var(--red); color:var(--paper); transform:rotate(2.5deg); box-shadow:-7px 7px 0 var(--yellow) }
+.ag-word span:hover{ transform:rotate(0deg) scale(1.04) }
+.ag-word span:active{ transform:scale(.94) }
+
+/* 旋转圆形徽章 */
+.stage-stamp{
+  position:absolute; top:-34px; right:-30px; z-index:3; width:126px; height:126px;
+  animation:spin 16s linear infinite; filter:drop-shadow(4px 4px 0 var(--ink));
+}
+@keyframes spin{ to{ transform:rotate(360deg) } }
+.stage-chip{
+  position:absolute; bottom:-18px; left:-24px; z-index:3;
+  background:var(--red); color:var(--paper); border:var(--line); box-shadow:var(--shadow-sm);
+  font:700 12px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+  padding:10px 14px; transform:rotate(-4deg);
+}
+.stage-arrow{
+  position:absolute; bottom:16px; right:-16px; z-index:3;
+  width:72px; height:72px; background:var(--blue); border:var(--line); box-shadow:var(--shadow-sm);
+  display:grid; place-items:center; transform:rotate(7deg); color:var(--paper);
+}
+.blink{ animation:blink 1.1s steps(2,start) infinite }
+@keyframes blink{ to{ opacity:0 } }
+
+.scroll-cue{
+  margin-top:clamp(36px,6vh,64px); display:flex; align-items:center; gap:14px;
+  font:700 11px/1 var(--font-m); letter-spacing:.18em; text-transform:uppercase; color:var(--ink-soft);
+}
+.scroll-cue i{
+  width:46px; height:22px; border:var(--line-2); position:relative; overflow:hidden; background:var(--paper-2);
+}
+.scroll-cue i::after{
+  content:''; position:absolute; left:6px; top:4px; width:8px; height:8px; background:var(--ink);
+  animation:cue 1.4s var(--ease-spring) infinite;
+}
+@keyframes cue{ 0%{ transform:translateX(0); opacity:1 } 70%{ transform:translateX(26px); opacity:0 } 100%{ opacity:0 } }
+
+/* ============ 跑马灯 ============ */
+.marquee{ background:var(--ink); border-block:var(--line); overflow:hidden; position:relative; z-index:5 }
+.marquee-track{ display:flex; width:max-content; animation:mq 26s linear infinite }
+.marquee:hover .marquee-track{ animation-play-state:paused }
+.marquee-group{ display:flex; align-items:center; gap:34px; padding:15px 17px; white-space:nowrap }
+.marquee-group span{ font:900 17px/1 var(--font-d); color:var(--paper); letter-spacing:.03em; text-transform:uppercase }
+.marquee-group svg{ flex-shrink:0 }
+.mq-star{ color:var(--yellow) }
+@keyframes mq{ to{ transform:translateX(-50%) } }
+.marquee-2{ background:var(--yellow); border-top:none }
+.marquee-2 .marquee-track{ animation:mqr 32s linear infinite }
+.marquee-2 .marquee-group span{ color:var(--ink) }
+.marquee-2 .mq-star{ color:var(--red) }
+@keyframes mqr{ from{ transform:translateX(-50%) } to{ transform:translateX(0) } }
+
+/* ============ 四大板块 ============ */
+.boards-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:clamp(20px,2.6vw,32px) }
+.board-card{
+  position:relative; background:var(--paper-2); border:var(--line); box-shadow:var(--shadow);
+  padding:clamp(22px,2.6vw,32px); cursor:pointer;
+  transition:transform .28s var(--ease-spring), box-shadow .28s var(--ease-spring);
+  display:flex; flex-direction:column; gap:18px;
+}
+.board-card:nth-child(1){ grid-column:span 7; transform:rotate(-.6deg) }
+.board-card:nth-child(2){ grid-column:span 5; transform:rotate(.7deg) }
+.board-card:nth-child(3){ grid-column:span 5; transform:rotate(.5deg) }
+.board-card:nth-child(4){ grid-column:span 7; transform:rotate(-.5deg) }
+.board-card:hover,.board-card:focus-visible{
+  transform:rotate(0deg) translate(-5px,-5px); box-shadow:var(--shadow-lg); z-index:3;
+}
+.board-card.c-y{ background:var(--paper-2) }
+.board-card .bc-bar{ position:absolute; top:0; left:0; right:0; height:9px; background:var(--yellow); border-bottom:var(--line-2) }
+.board-card:nth-child(2) .bc-bar{ background:var(--blue) }
+.board-card:nth-child(3) .bc-bar{ background:var(--red) }
+.board-card:nth-child(4) .bc-bar{ background:var(--cyan) }
+
+.bc-top{ display:flex; justify-content:space-between; align-items:flex-start }
+.bc-icon{ width:58px; height:58px; border:var(--line); display:grid; place-items:center; background:var(--paper); box-shadow:4px 4px 0 var(--ink) }
+.board-card:nth-child(1) .bc-icon{ background:var(--yellow) }
+.board-card:nth-child(2) .bc-icon{ background:var(--blue); color:var(--paper) }
+.board-card:nth-child(3) .bc-icon{ background:var(--red); color:var(--paper) }
+.board-card:nth-child(4) .bc-icon{ background:var(--cyan) }
+.bc-no{ font:900 40px/1 var(--font-d); opacity:.16 }
+.board-card h3{ font:900 clamp(23px,2.4vw,30px)/1.2 var(--font-d) }
+.bc-list{ display:grid; gap:8px }
+.bc-list li{ display:flex; gap:10px; align-items:baseline; font-size:14.5px; color:var(--ink-soft) }
+.bc-list li::before{ content:''; width:10px; height:10px; background:var(--ink); flex-shrink:0; transform:translateY(1px) rotate(45deg) }
+
+/* 卡片内视觉小图（纯 CSS 绘图）*/
+.bc-visual{ margin-top:auto; border:var(--line-2); background:var(--paper); padding:18px; min-height:118px; position:relative; overflow:hidden }
+.bc-visual::before{ content:''; position:absolute; inset:0; background-image:radial-gradient(var(--ink) 1.4px, transparent 1.4px); background-size:13px 13px; opacity:.12 }
+.bcv{ position:relative; z-index:1 }
+/* 01 播放键构图 */
+.bcv-art{ display:flex; align-items:center; gap:16px }
+.bcv-art .disc{ width:74px; height:74px; border-radius:50%; border:var(--line-2); background:conic-gradient(var(--ink) 0 25%, transparent 0 50%, var(--ink) 0 75%, transparent 0); display:grid; place-items:center }
+.bcv-art .disc i{ width:26px; height:26px; background:var(--yellow); border:var(--line-2); border-radius:50% }
+.bcv-art .tri{ width:0; height:0; border-left:34px solid var(--ink); border-top:22px solid transparent; border-bottom:22px solid transparent; margin-left:8px }
+/* 02 对话块 */
+.bcv-chat{ display:grid; gap:9px }
+.bcv-chat i{ display:block; border:var(--line-2); padding:6px 12px; font:700 11.5px/1.5 var(--font-m); width:fit-content; max-width:88%; background:var(--paper-2) }
+.bcv-chat i:last-child{ margin-left:auto; background:var(--yellow); transform:rotate(-1deg) }
+/* 03 代码条 */
+.bcv-code{ display:grid; gap:9px }
+.bcv-code i{ height:13px; background:var(--ink) }
+.bcv-code i:nth-child(1){ width:62% } .bcv-code i:nth-child(2){ width:88%; background:var(--blue) } .bcv-code i:nth-child(3){ width:44%; background:var(--yellow) } .bcv-code i:nth-child(4){ width:72% }
+/* 04 拼贴 */
+.bcv-collage{ display:flex; gap:-8px }
+.bcv-collage i{ width:56px; height:74px; border:var(--line-2); background:var(--paper-2) }
+.bcv-collage i:nth-child(2){ background:var(--yellow); transform:rotate(-5deg) translateX(-10px); z-index:1 }
+.bcv-collage i:nth-child(3){ background:var(--blue); transform:rotate(4deg) translateX(-18px) }
+.bcv-collage .plus{ margin-left:auto; align-self:center; font:900 30px/1 var(--font-d); color:var(--red); transform:translateX(-12px) }
+
+.bc-more{ display:flex; justify-content:space-between; align-items:center; font:700 12px/1 var(--font-m); letter-spacing:.12em; text-transform:uppercase; border-top:var(--line-2); padding-top:14px }
+.bc-more svg{ transition:transform .25s var(--ease-spring) }
+.board-card:hover .bc-more svg{ transform:translateX(6px) }
+@media (max-width:900px){ .board-card{ grid-column:1 / -1 !important } }
+
+.board-foot{
+  margin-top:40px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center;
+  font:900 clamp(15px,2vw,20px)/1 var(--font-d); text-transform:uppercase;
+}
+.board-foot b{ width:14px; height:14px; background:var(--ink); transform:rotate(45deg) }
+.board-foot span{ border:var(--line-2); padding:10px 16px; background:var(--paper-2); box-shadow:4px 4px 0 var(--ink) }
+
+/* ============ 作品墙（图文画廊）============ */
+.gallery-grid{
+  display:grid; grid-template-columns:repeat(12,1fr); grid-auto-rows:96px; gap:clamp(18px,2.4vw,28px);
+}
+.g-item{ position:relative; border:var(--line); background:var(--paper-2); box-shadow:var(--shadow-sm); transition:transform .3s var(--ease-spring), box-shadow .3s var(--ease-spring) }
+.g-item:nth-child(1){ grid-column:span 5; grid-row:span 4; transform:rotate(-.8deg) }
+.g-item:nth-child(2){ grid-column:span 4; grid-row:span 3; transform:rotate(1deg) }
+.g-item:nth-child(3){ grid-column:span 3; grid-row:span 3; transform:rotate(-1.4deg) }
+.g-item:nth-child(4){ grid-column:span 3; grid-row:span 2; transform:rotate(1.2deg) }
+.g-item:nth-child(5){ grid-column:span 4; grid-row:span 3; transform:rotate(.8deg) }
+.g-item:nth-child(6){ grid-column:span 5; grid-row:span 2; transform:rotate(-.6deg) }
+.g-item:hover{ transform:rotate(0deg) translate(-4px,-4px); box-shadow:var(--shadow); z-index:2 }
+.g-item figure{ height:100%; display:flex; flex-direction:column }
+.g-item img{ width:100%; height:100%; object-fit:cover; flex:1; filter:saturate(.92) contrast(1.05); border-bottom:var(--line-2) }
+.g-cap{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 14px }
+.g-cap b{ font:900 13px/1.4 var(--font-d) }
+.g-cap span{ font:400 10.5px/1.4 var(--font-m); color:var(--ink-soft); white-space:nowrap }
+.g-item.tall img{ min-height:0 }
+.g-tag{
+  position:absolute; top:12px; left:12px; z-index:2;
+  font:700 10px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+  background:var(--yellow); border:2px solid var(--ink); padding:6px 10px;
+  transform:rotate(-2deg);
+}
+.g-item:nth-child(3) .g-tag{ background:var(--red); color:var(--paper) }
+.g-item:nth-child(5) .g-tag{ background:var(--blue); color:var(--paper) }
+@media (max-width:900px){
+  .gallery-grid{ grid-auto-rows:72px }
+  .g-item{ grid-column:1 / -1 !important; grid-row:span 3 !important }
+}
+
+/* ============ 灵感发生器（实验室）============ */
+.lab-grid{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(24px,3.4vw,44px); align-items:start }
+@media (max-width:960px){ .lab-grid{ grid-template-columns:1fr } }
+
+.panel{ background:var(--paper-2); border:var(--line); box-shadow:var(--shadow); padding:clamp(22px,3vw,34px) }
+.panel-title{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  font:900 15px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+  border-bottom:var(--line-2); padding-bottom:14px; margin-bottom:22px;
+}
+.panel-title .dots{ display:flex; gap:6px }
+.panel-title .dots i{ width:11px; height:11px; border:2px solid var(--ink) }
+.panel-title .dots i:nth-child(1){ background:var(--red) }
+.panel-title .dots i:nth-child(2){ background:var(--yellow) }
+.panel-title .dots i:nth-child(3){ background:var(--cyan) }
+
+.field{ display:block; margin-bottom:22px }
+.field-label{ display:block; font:700 11.5px/1 var(--font-m); letter-spacing:.12em; text-transform:uppercase; margin-bottom:10px; color:var(--ink-soft) }
+.field-label b{ color:var(--ink) }
+.input{
+  width:100%; border:var(--line); background:#fff; padding:14px 16px;
+  font:700 15px/1.4 var(--font-b); color:var(--ink);
+  transition:box-shadow .2s var(--ease-spring), transform .2s var(--ease-spring);
+}
+.input::placeholder{ color:#9a968a; font-weight:400 }
+.input:focus{ outline:none; transform:translate(-3px,-3px); box-shadow:6px 6px 0 var(--yellow), 6px 6px 0 3px var(--ink) }
+
+.chips{ display:flex; flex-wrap:wrap; gap:10px }
+.chip-btn{
+  font:700 12px/1 var(--font-m); letter-spacing:.06em; text-transform:uppercase;
+  border:var(--line-2); background:var(--paper); padding:10px 16px;
+  transition:transform .16s var(--ease-spring), box-shadow .16s var(--ease-spring), background .16s;
+}
+.chip-btn:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--ink) }
+.chip-btn:active{ transform:translate(2px,2px); box-shadow:none }
+.chip-btn.is-on{ background:var(--ink); color:var(--yellow); box-shadow:4px 4px 0 var(--yellow) }
+
+.range-row{ display:flex; align-items:center; gap:16px }
+.range{ -webkit-appearance:none; appearance:none; flex:1; height:18px; background:var(--paper); border:var(--line-2); cursor:pointer }
+.range::-webkit-slider-thumb{
+  -webkit-appearance:none; width:30px; height:30px; background:var(--yellow);
+  border:var(--line-2); box-shadow:3px 3px 0 var(--ink); cursor:grab;
+}
+.range::-moz-range-thumb{ width:26px; height:26px; border-radius:0; background:var(--yellow); border:var(--line-2); box-shadow:3px 3px 0 var(--ink); cursor:grab }
+.range-scale{ display:flex; justify-content:space-between; font:400 10.5px/1 var(--font-m); color:var(--ink-soft); margin-top:8px; text-transform:uppercase; letter-spacing:.08em }
+
+.lab-actions{ display:flex; flex-wrap:wrap; gap:14px; margin-top:6px }
+.tiny-note{ margin-top:18px; font:400 12px/1.8 var(--font-m); color:var(--ink-soft); border-left:5px solid var(--yellow); padding-left:12px }
+.tiny-note.center{ border-left:none; text-align:center }
+
+/* 舞台（生成结果）*/
+.lab-stage{ position:relative }
+.artifact-frame{ position:relative; border:var(--line); box-shadow:var(--shadow); background:var(--paper-2); transform:rotate(.6deg) }
+#artCanvas{ display:block; width:100%; height:auto }
+.artifact-badge{
+  position:absolute; top:-14px; right:-10px; z-index:3;
+  font:700 11px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+  background:var(--ink); color:var(--yellow); border:var(--line-2); padding:8px 12px;
+  transform:rotate(3deg); box-shadow:4px 4px 0 var(--ink);
+}
+.artifact-info{ margin-top:22px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between }
+.type-out{ font:700 13px/1.5 var(--font-m); min-height:1.5em }
+.type-out::after{ content:'_'; animation:blink 1s steps(2,start) infinite; color:var(--blue) }
+.artifact-tags{ display:flex; gap:8px; flex-wrap:wrap }
+.artifact-tags span{ font:400 10.5px/1 var(--font-m); border:2px solid var(--ink); padding:5px 9px; background:var(--paper); text-transform:uppercase }
+.artifact-actions{ margin-top:20px; display:flex; gap:12px; flex-wrap:wrap }
+
+.gen-overlay{
+  position:absolute; inset:0; z-index:5; display:none; place-items:center;
+  background:rgba(241,238,227,.88); border:var(--line);
+}
+.gen-overlay.is-on{ display:grid }
+.gen-box{ text-align:center; display:grid; gap:16px; justify-items:center }
+.gen-blocks{ display:flex; gap:8px }
+.gen-blocks i{ width:20px; height:34px; background:var(--ink); animation:gblk 0.7s var(--ease-spring) infinite }
+.gen-blocks i:nth-child(2){ background:var(--yellow); animation-delay:.09s }
+.gen-blocks i:nth-child(3){ background:var(--blue); animation-delay:.18s }
+.gen-blocks i:nth-child(4){ animation-delay:.27s }
+@keyframes gblk{ 0%,100%{ transform:scaleY(.35) } 50%{ transform:scaleY(1) } }
+.gen-box p{ font:700 12px/1 var(--font-m); letter-spacing:.14em; text-transform:uppercase }
+
+/* ============ 贴纸工作台 ============ */
+.desk-panel{
+  position:relative; border:var(--line); box-shadow:var(--shadow); background:var(--paper-2);
+  min-height:480px; overflow:hidden; touch-action:none;
+  background-image:
+    linear-gradient(rgba(20,20,20,.09) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(20,20,20,.09) 1.5px, transparent 1.5px);
+  background-size:44px 44px;
+}
+.desk-hint{
+  position:absolute; top:18px; left:18px; z-index:1;
+  font:700 11.5px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+  background:var(--yellow); border:var(--line-2); padding:9px 13px; box-shadow:4px 4px 0 var(--ink);
+  transform:rotate(-1.5deg);
+}
+.sticker{
+  position:absolute; z-index:4; user-select:none; cursor:grab; touch-action:none;
+  border:var(--line); box-shadow:var(--shadow-sm); background:var(--paper-2);
+  padding:12px 16px; font:900 15px/1 var(--font-d); letter-spacing:.02em;
+  transition:box-shadow .18s var(--ease-spring);
+  will-change:transform;
+}
+.sticker:active{ cursor:grabbing }
+.sticker.is-drag{ box-shadow:var(--shadow-lg); z-index:9; outline:3px dashed var(--blue); outline-offset:3px }
+.sticker.s-y{ background:var(--yellow) }
+.sticker.s-b{ background:var(--blue); color:var(--paper) }
+.sticker.s-r{ background:var(--red); color:var(--paper) }
+.sticker.s-k{ background:var(--ink); color:var(--paper) }
+.sticker.s-m{ font-family:var(--font-m); font-weight:700; font-size:13px; letter-spacing:.08em }
+.sticker svg{ display:block; pointer-events:none }
+.desk-bar{
+  position:absolute; left:0; right:0; bottom:0; z-index:6;
+  display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+  background:var(--paper); border-top:var(--line); padding:12px 18px;
+}
+.desk-count{ font:700 12px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase }
+.desk-btns{ display:flex; gap:10px }
+@media (max-width:640px){ .desk-panel{ min-height:420px } }
+
+/* ============ 入场券 / 会员卡 ============ */
+.member-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:clamp(24px,3.4vw,44px); align-items:center }
+@media (max-width:960px){ .member-grid{ grid-template-columns:1fr } }
+
+.serial-row{
+  display:flex; justify-content:space-between; align-items:center;
+  border:var(--line-2); background:var(--paper); padding:13px 16px; margin-bottom:22px;
+  font:700 12px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+}
+.serial-row b{ font-size:15px; color:var(--blue) }
+.member-actions{ display:flex; gap:14px; flex-wrap:wrap }
+
+.card-scene{ perspective:1400px }
+.card-flipper{
+  position:relative; transform-style:preserve-3d;
+  transition:transform .7s var(--ease-spring);
+}
+.card-flipper.is-flipped{ transform:rotateY(180deg) }
+.card-face{ backface-visibility:hidden; -webkit-backface-visibility:hidden }
+.card-face.back{ position:absolute; inset:0; transform:rotateY(180deg) }
+#memberCanvas,#memberCanvasBack{ display:block; width:100%; height:auto; border:var(--line); box-shadow:var(--shadow) }
+.card-flip-btn{ margin-top:20px }
+.member-preview{ position:relative }
+
+/* ============ JOIN CTA ============ */
+.join{ background:var(--ink); color:var(--paper); border-top:var(--line) }
+.join .wrap{ text-align:left; position:relative }
+.join-kicker{
+  display:inline-block; font:700 12px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase;
+  border:2px solid var(--yellow); color:var(--yellow); padding:9px 14px; margin-bottom:26px;
+}
+.join h2{ font:900 clamp(40px,6.4vw,86px)/1.06 var(--font-d); color:var(--paper) }
+.join h2 .mk-y{ color:var(--ink); background:var(--yellow); padding:0 .12em; display:inline-block; transform:rotate(-1.6deg) }
+.join-sub{ margin-top:22px; color:#b9b5a7; font-size:clamp(15px,1.7vw,18px); max-width:52ch }
+.join-cta{ margin-top:40px; display:flex; gap:16px; flex-wrap:wrap }
+.join .btn-ghost{ background:transparent; color:var(--paper); border-color:var(--paper); box-shadow:6px 6px 0 var(--yellow) }
+.join-foot{ margin-top:44px; font:700 12px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:#8f8b7d }
+.join-orbit{ position:absolute; top:-30px; right:0; display:flex; gap:10px }
+.join-orbit i{ width:15px; height:15px; border:2px solid var(--yellow) }
+.join-orbit i:nth-child(2){ background:var(--yellow) }
+.join-orbit i:nth-child(3){ background:var(--red); border-color:var(--red) }
+.join-orbit i:nth-child(5){ background:var(--cyan); border-color:var(--cyan) }
+@media (max-width:640px){ .join-orbit{ display:none } }
+
+/* ============ FOOTER ============ */
+.footer{ background:var(--ink); color:var(--paper); border-top:var(--line); padding:0 }
+.footer-inner{
+  display:grid; grid-template-columns:1.2fr .8fr; gap:40px;
+  padding:clamp(40px,5vw,64px) 0;
+}
+@media (max-width:768px){ .footer-inner{ grid-template-columns:1fr } }
+.footer-brand{ display:flex; gap:18px; align-items:flex-start }
+.footer-brand .brand-mark{ flex-shrink:0 }
+.footer-brand p{ color:#b9b5a7; font-size:14px; max-width:34ch }
+.footer-links{ display:flex; flex-direction:column; gap:10px; align-items:flex-end }
+@media (max-width:768px){ .footer-links{ align-items:flex-start } }
+.footer-links a{
+  font:700 13px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--paper); border-bottom:2px solid var(--yellow); padding-bottom:4px; width:fit-content;
+  transition:color .2s, transform .2s var(--ease-spring);
+}
+.footer-links a:hover{ color:var(--yellow); transform:translateX(5px) }
+.footer-fine{
+  border-top:2px solid #3a3831; padding:22px 0; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  font:400 11.5px/1.8 var(--font-m); color:#8f8b7d;
+}
+
+/* ============ 弹层 / 提示 ============ */
+.modal{ position:fixed; inset:0; z-index:2500; display:none; align-items:center; justify-content:center; padding:24px }
+.modal.is-open{ display:flex }
+.modal-backdrop{ position:absolute; inset:0; background:rgba(20,20,20,.55) }
+.modal-card{
+  position:relative; background:var(--paper); border:var(--line); box-shadow:var(--shadow-lg);
+  width:min(560px,100%); max-height:86vh; overflow:auto;
+  animation:pop .4s var(--ease-spring);
+}
+@keyframes pop{ from{ transform:translateY(30px) rotate(-1.5deg); opacity:0 } to{ transform:none; opacity:1 } }
+.modal-close{
+  position:absolute; top:14px; right:14px; width:40px; height:40px;
+  border:var(--line-2); background:var(--red); color:var(--paper);
+  display:grid; place-items:center; box-shadow:4px 4px 0 var(--ink);
+  transition:transform .18s var(--ease-spring);
+}
+.modal-close:hover{ transform:rotate(90deg) }
+.modal-body{ padding:clamp(24px,4vw,36px) }
+.modal-body .m-kicker{ display:inline-block; font:700 11px/1 var(--font-m); letter-spacing:.12em; text-transform:uppercase; background:var(--yellow); border:var(--line-2); padding:7px 11px; margin-bottom:16px }
+.modal-body h3{ font:900 clamp(24px,3vw,32px)/1.2 var(--font-d); margin-bottom:14px }
+.modal-body p{ color:var(--ink-soft); font-size:14.5px; margin-bottom:14px }
+.modal-body .m-list{ display:grid; gap:10px; margin:18px 0 24px }
+.modal-body .m-list li{ display:flex; gap:10px; align-items:baseline; font-size:14px }
+.modal-body .m-list li::before{ content:''; width:9px; height:9px; background:var(--blue); flex-shrink:0; transform:translateY(1px) }
+
+.toast{
+  position:fixed; left:50%; bottom:30px; z-index:2600;
+  transform:translate(-50%,140%); background:var(--ink); color:var(--paper);
+  border:var(--line); box-shadow:6px 6px 0 var(--yellow);
+  font:700 13px/1 var(--font-m); letter-spacing:.06em; padding:15px 22px;
+  transition:transform .45s var(--ease-spring); text-transform:uppercase; max-width:90vw; text-align:center;
+}
+.toast.is-on{ transform:translate(-50%,0) }
+
+.confetti{ position:fixed; inset:0; z-index:2400; pointer-events:none }
+
+/* ============ 灵感创作区 / PLAYGROUND ============ */
+.play-top{
+  display:grid; grid-template-columns:260px 1fr; gap:0;
+  border:var(--line); box-shadow:var(--shadow); background:var(--paper-2);
+  margin-bottom:clamp(28px,4vw,48px); min-height:300px;
+}
+.play-side{
+  background:var(--ink); color:var(--paper); padding:26px 22px;
+  display:flex; flex-direction:column; gap:14px; border-right:var(--line);
+}
+.play-side h3{ font:900 24px/1.15 var(--font-d); color:var(--yellow) }
+.play-side p{ font:400 12.5px/1.9 var(--font-m); color:#b9b5a7 }
+.play-side .ps-data{ margin-top:auto; display:grid; gap:8px }
+.play-side .ps-data span{ font:700 11px/1 var(--font-m); letter-spacing:.1em; text-transform:uppercase; color:#8f8b7d }
+.play-side .ps-data b{ font:700 13px/1 var(--font-m); color:var(--paper) }
+@media (max-width:900px){ .play-top{ grid-template-columns:1fr } .play-side{ border-right:none; border-bottom:var(--line) } .play-side .ps-data{ margin-top:6px } }
+
+/* --- 磁吸字母墙 + 粒子画布 --- */
+.magnet-wrap{ position:relative; overflow:hidden; touch-action:none; cursor:crosshair }
+#magnetCanvas{ display:block; width:100%; height:100%; position:absolute; inset:0 }
+.magnet-field{ position:relative; z-index:2; min-height:300px; padding:26px; display:flex; flex-wrap:wrap; gap:16px; align-content:center; justify-content:center }
+.mg-item{
+  position:relative; left:0; top:0;
+  border:var(--line); box-shadow:var(--shadow-sm);
+  font:900 clamp(20px,3vw,34px)/1 var(--font-d);
+  padding:14px 20px; background:var(--paper);
+  user-select:none; cursor:grab; white-space:nowrap;
+  will-change:transform;
+}
+.mg-y{ background:var(--yellow) } .mg-b{ background:var(--blue); color:var(--paper) }
+.mg-r{ background:var(--red); color:var(--paper) } .mg-k{ background:var(--ink); color:var(--paper) }
+.mg-m{ font-family:var(--font-m); font-weight:700; font-size:clamp(15px,2.2vw,22px); letter-spacing:.04em }
+.magnet-hint{
+  position:absolute; left:20px; top:18px; z-index:3;
+  font:700 11px/1 var(--font-m); letter-spacing:.12em; text-transform:uppercase;
+  background:var(--paper); border:var(--line-2); padding:8px 12px; box-shadow:4px 4px 0 var(--ink);
+  transform:rotate(-1.5deg); pointer-events:none;
+}
+
+/* --- 3D 电脑（纯 CSS 立体）--- */
+.play-lab{ display:grid; grid-template-columns:.9fr 1.1fr; gap:clamp(24px,3.4vw,44px); align-items:start }
+@media (max-width:960px){ .play-lab{ grid-template-columns:1fr } }
+.lab-notes{ display:grid; gap:18px }
+.note-card{ border:var(--line-2); background:var(--paper-2); padding:18px 20px; box-shadow:5px 5px 0 var(--ink) }
+.note-card b{ font:900 15px/1.4 var(--font-d); display:flex; align-items:center; gap:10px }
+.note-card b i{ width:12px; height:12px; flex-shrink:0; display:inline-block }
+.note-card p{ margin-top:8px; font-size:13.5px; line-height:1.8; color:var(--ink-soft) }
+.play-lab-actions{ display:flex; gap:12px; flex-wrap:wrap; margin-top:6px }
+
+.rig-scene{
+  position:relative; border:var(--line); box-shadow:var(--shadow); background:var(--paper-2);
+  min-height:460px; display:grid; place-items:center; overflow:hidden;
+  background-image:
+    linear-gradient(rgba(20,20,20,.08) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(20,20,20,.08) 1.5px, transparent 1.5px);
+  background-size:40px 40px;
+  touch-action:none; cursor:grab;
+}
+.rig-scene:active{ cursor:grabbing }
+.rig-scene .rs-corner{ position:absolute; width:22px; height:22px; border:var(--line-2); background:var(--yellow); z-index:3 }
+.rig-scene .rs-corner.c1{ top:14px; left:14px } .rig-scene .rs-corner.c2{ top:14px; right:14px; background:var(--red) }
+.rig-scene .rs-corner.c3{ bottom:14px; left:14px; background:var(--blue) } .rig-scene .rs-corner.c4{ bottom:14px; right:14px }
+.rig-tip{
+  position:absolute; top:20px; left:50%; transform:translateX(-50%) rotate(-1deg); z-index:4;
+  font:700 11px/1 var(--font-m); letter-spacing:.12em; text-transform:uppercase;
+  background:var(--ink); color:var(--yellow); padding:9px 14px; border:2px solid var(--ink);
+  pointer-events:none; transition:opacity .4s;
+}
+.rig-bar{
+  position:absolute; left:0; right:0; bottom:0; z-index:4;
+  display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+  background:var(--paper); border-top:var(--line); padding:11px 16px;
+}
+.rig-readout{ font:700 11.5px/1 var(--font-m); letter-spacing:.08em; color:var(--ink-soft); text-transform:uppercase }
+.rig-readout b{ color:var(--blue) }
+.rig-btns{ display:flex; gap:9px; flex-wrap:wrap }
+
+.rig-view{ perspective:1300px; width:100%; height:100%; display:grid; place-items:center; padding:70px 20px 76px }
+.rig{ position:relative; transform-style:preserve-3d; width:300px; height:250px; will-change:transform }
+/* — 显示器 — */
+.rig-screen{ position:absolute; top:0; left:0; width:300px; height:196px; transform-style:preserve-3d }
+.rs-front{
+  position:absolute; inset:0; background:var(--paper);
+  border:3px solid var(--ink); box-shadow:none;
+  transform:translateZ(8px); display:grid; place-items:center;
+}
+.rs-bezel{ position:relative; width:266px; height:162px; border:3px solid var(--ink); background:var(--ink); overflow:hidden }
+.rs-scan{ position:absolute; inset:0; z-index:5; pointer-events:none;
+  background:repeating-linear-gradient(transparent 0 3px, rgba(251,249,242,.06) 3px 4px) }
+.rs-glow{ position:absolute; inset:0; z-index:4; background:radial-gradient(ellipse at 30% 20%, rgba(255,210,31,.14), transparent 60%) }
+/* 屏幕内容：像素 AG + 代码滚动 */
+.rs-pix{ position:relative; z-index:2; display:grid; grid-template-columns:repeat(3,1fr); gap:5px; width:96px; margin:14px auto 0 }
+.rs-pix i{ width:22px; height:22px; background:var(--yellow) }
+.rs-pix i:nth-child(2){ background:var(--red) } .rs-pix i:nth-child(4){ background:var(--blue) }
+.rs-code{ position:relative; z-index:2; margin-top:12px; height:76px; overflow:hidden; padding:8px 10px; border:2px solid #3a3831 }
+.rs-code ul{ animation:codeScroll 5.5s linear infinite }
+.rs-code li{ font:700 10px/1.9 var(--font-m); color:var(--cyan); white-space:nowrap }
+.rs-code li:nth-child(even){ color:var(--yellow) }
+.rs-code li.err{ color:var(--red) }
+@keyframes codeScroll{ from{ transform:translateY(0) } to{ transform:translateY(-50%) } }
+.rs-cursor{ position:relative; z-index:2; display:block; width:9px; height:15px; background:var(--yellow); margin:6px auto 0; animation:blink 1s steps(2,start) infinite }
+/* 显示器厚度（四沿） */
+.rs-edge{ position:absolute; background:var(--ink) }
+.rs-edge.top   { left:0; right:0; top:0;    height:16px; transform:rotateX(90deg); transform-origin:top }
+.rs-edge.bottom{ left:0; right:0; bottom:0; height:16px; transform:rotateX(-90deg); transform-origin:bottom }
+.rs-edge.left  { top:0; bottom:0; left:0;  width:16px;  transform:rotateY(-90deg); transform-origin:left }
+.rs-edge.right { top:0; bottom:0; right:0; width:16px;  transform:rotateY(90deg); transform-origin:right }
+.rs-back{
+  position:absolute; inset:0; background:var(--paper); border:3px solid var(--ink);
+  transform:translateZ(-8px) rotateY(180deg);
+}
+.rs-back .rb-sticker{
+  position:absolute; top:16px; left:18px; width:120px; padding:9px 11px;
+  background:var(--yellow); border:2.5px solid var(--ink); box-shadow:4px 4px 0 rgba(20,20,20,.35);
+  font:900 13px/1.3 var(--font-d); transform:rotate(-4deg);
+}
+.rs-back .rb-ports{ position:absolute; bottom:18px; right:16px; display:flex; gap:7px }
+.rs-back .rb-ports i{ width:16px; height:22px; background:var(--ink) }
+.rs-back .rb-ports i:nth-child(2){ background:var(--blue); height:26px }
+.rs-back .rb-vents{ position:absolute; bottom:20px; left:20px; width:110px; height:44px;
+  background:repeating-linear-gradient(90deg, var(--ink) 0 4px, transparent 4px 11px) }
+.rs-back .rb-label{ position:absolute; top:20px; right:18px; font:700 10px/1 var(--font-m); color:var(--ink-soft) }
+/* 屏幕右下角小贴纸 */
+.rs-tag{
+  position:absolute; right:10px; bottom:8px; z-index:6;
+  font:700 9px/1 var(--font-m); letter-spacing:.08em; text-transform:uppercase;
+  background:var(--red); color:var(--paper); border:2px solid var(--ink); padding:4px 7px;
+  transform:rotate(-3deg);
+}
+/* — 支架 + 底座 — */
+.rig-stand{
+  position:absolute; left:50%; top:190px; width:26px; height:52px;
+  transform:translateX(-50%) translateZ(0) rotateX(14deg); transform-origin:top;
+  background:var(--ink);
+}
+.rig-stand-back{ position:absolute; left:50%; top:190px; width:26px; height:52px;
+  transform:translateX(-50%) translateZ(-40px) rotateX(-14deg); transform-origin:top;
+  background:#3a3831;
+}
+.rig-base{
+  position:absolute; left:50%; top:238px; width:190px; height:34px;
+  transform:translateX(-50%); transform-style:preserve-3d;
+}
+.rb-top{ position:absolute; inset:0; background:var(--paper); border:3px solid var(--ink); transform:rotateX(90deg) translateZ(-17px) }
+.rb-front{ position:absolute; left:0; right:0; bottom:0; height:34px; background:var(--yellow); border:3px solid var(--ink); transform:translateZ(17px) }
+.rb-front::after{ content:''; position:absolute; left:16px; top:12px; width:64px; height:9px; background:var(--ink) }
+/* — 键盘 — */
+.rig-kb{
+  position:absolute; left:50%; top:214px; width:210px; height:64px;
+  transform:translateX(-92px) rotateX(52deg); transform-origin:top;
+  background:var(--paper); border:3px solid var(--ink);
+  transform-style:preserve-3d;
+}
+.rk-keys{ position:absolute; inset:7px; display:grid; grid-template-columns:repeat(9,1fr); gap:4px; padding:3px }
+.rk-keys i{ background:var(--paper-2); border:2px solid var(--ink) }
+.rk-keys i.k-y{ background:var(--yellow) } .rk-keys i.k-b{ background:var(--blue) } .rk-keys i.k-r{ background:var(--red) }
+.rk-space{ grid-column:3 / 8 }
+
+/* --- 3D 放大查看模态 --- */
+.rig-modal{ position:fixed; inset:0; z-index:2700; display:none; place-items:center; padding:20px }
+.rig-modal.is-open{ display:grid }
+.rig-modal .modal-backdrop{ position:absolute; inset:0; background:rgba(20,20,20,.7) }
+.rig-modal-card{
+  position:relative; width:min(920px,100%); height:min(660px,100%);
+  background:var(--paper); border:var(--line); box-shadow:var(--shadow-lg);
+  display:grid; grid-template-rows:auto 1fr; animation:pop .4s var(--ease-spring);
+}
+.rig-modal-head{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  border-bottom:var(--line); padding:14px 18px;
+}
+.rig-modal-head b{ font:900 16px/1 var(--font-m); letter-spacing:.08em; text-transform:uppercase }
+.rig-modal-head span{ font:400 11px/1 var(--font-m); color:var(--ink-soft) }
+.rig-modal-scene{
+  position:relative; overflow:hidden; touch-action:none; cursor:grab;
+  background-image:
+    linear-gradient(rgba(20,20,20,.08) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(20,20,20,.08) 1.5px, transparent 1.5px);
+  background-size:40px 40px;
+}
+.rig-modal-scene:active{ cursor:grabbing }
+.rig-modal-scene .rig-view{ padding:20px }
+.rig-modal-foot{
+  position:absolute; left:0; right:0; bottom:0;
+  display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+  border-top:var(--line); background:var(--paper); padding:11px 16px;
+}
+.rig-modal-scene .rig{ width:390px; height:320px }
+.rig-modal-scene .rig-screen{ width:390px; height:252px }
+.rig-modal-scene .rs-bezel{ width:346px; height:210px }
+.rig-modal-scene .rs-pix i{ width:30px; height:30px }
+.rig-modal-scene .rs-pix{ width:130px; gap:7px }
+.rig-modal-scene .rs-code li{ font-size:12px; line-height:2 }
+.rig-modal-scene .rs-code{ height:96px }
+.rig-modal-scene .rs-cursor{ width:12px; height:20px }
+.rig-modal-scene .rig-stand, .rig-modal-scene .rig-stand-back{ top:246px; height:64px }
+.rig-modal-scene .rig-base{ top:304px; width:240px }
+.rig-modal-scene .rb-top{ transform:rotateX(90deg) translateZ(-21px) }
+.rig-modal-scene .rb-front{ transform:translateZ(21px) }
+.rig-modal-scene .rig-kb{ top:280px; width:270px; height:80px; transform:translateX(-120px) rotateX(52deg) }
+.rig-modal-scene .rs-back .rb-sticker{ width:160px; font-size:16px }
+.rig-modal-scene .rs-back .rb-ports i{ width:22px; height:30px }
+.rig-modal-scene .rs-back .rb-ports i:nth-child(2){ height:36px }
+.rig-modal-scene .rs-back .rb-vents{ width:150px; height:56px; background:repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 15px) }
+.rig-modal-scene .rs-tag{ font-size:11px; padding:6px 10px }
+
+/* --- 碎片系统（打碎/重组）--- */
+.shard{
+  position:absolute; inset:0; transform-style:preserve-3d;
+  transform:translate3d(var(--ex-x,0px),var(--ex-y,0px),var(--ex-z,0px)) rotateZ(var(--ex-r,0deg));
+  transition:transform .68s var(--ease-spring);
+}
+@media (prefers-reduced-motion:reduce){ .shard{ transition:none } }
+
+/* --- 几何空间环境 --- */
+.env{ position:absolute; inset:0; transform-style:preserve-3d; pointer-events:none }
+/* 虚线包围立方 */
+.env-box{ position:absolute; left:50%; top:125px; width:440px; height:440px; margin:-220px 0 0 -220px; transform-style:preserve-3d }
+.eb-f{ position:absolute; inset:0; border:2.5px dashed rgba(20,20,20,.3) }
+.eb-f.bf1{ transform:translateZ(220px); background:rgba(251,249,242,.22) }
+.eb-f.bf2{ transform:rotateY(180deg) translateZ(220px) }
+.eb-f.bf3{ transform:rotateY(90deg) translateZ(220px); background:rgba(255,210,31,.06) }
+.eb-f.bf4{ transform:rotateY(-90deg) translateZ(220px) }
+.eb-f.bf5{ transform:rotateX(90deg) translateZ(220px); background:rgba(37,68,232,.05) }
+.eb-f.bf6{ transform:rotateX(-90deg) translateZ(220px) }
+/* 网格地面 */
+.env-floor{
+  position:absolute; left:50%; top:272px; width:560px; height:560px; margin:-280px 0 0 -280px;
+  transform:rotateX(90deg);
+  background:
+    repeating-linear-gradient(0deg, rgba(20,20,20,.14) 0 2px, transparent 2px 40px),
+    repeating-linear-gradient(90deg, rgba(20,20,20,.14) 0 2px, transparent 2px 40px);
+  border:2.5px dashed rgba(20,20,20,.32);
+}
+.env-floor::after{
+  content:''; position:absolute; left:50%; top:50%; width:18px; height:18px; margin:-9px;
+  background:var(--yellow); border:2.5px solid var(--ink); transform:rotate(45deg);
+}
+/* 轨道环 ×2 */
+.env-ringwrap{ position:absolute; transform-style:preserve-3d }
+.env-ringwrap.r1{ left:50%; top:252px; width:500px; height:500px; margin:-250px 0 0 -250px; transform:rotateX(90deg) }
+.env-ringwrap.r2{ left:50%; top:120px; width:360px; height:360px; margin:-180px 0 0 -180px; transform:rotateY(70deg) rotateX(12deg) }
+.env-ring{ display:block; width:100%; height:100%; border-radius:50%; border:3px dashed var(--blue); animation:ringSpin 16s linear infinite }
+.env-ringwrap.r2 .env-ring{ border-color:var(--yellow); border-width:2.5px; animation-duration:22s; animation-direction:reverse }
+@keyframes ringSpin{ to{ transform:rotate(360deg) } }
+/* 漂浮小立方 ×2 */
+.env-mini{ position:absolute; width:70px; height:70px; transform-style:preserve-3d }
+.env-mini.m1{ left:26px; top:64px; transform:translate3d(0,0,-120px) scale(.9) }
+.env-mini.m2{ left:252px; top:176px; transform:translate3d(0,10px,80px) scale(.72) }
+.em-spin{ display:block; position:absolute; inset:0; transform-style:preserve-3d; animation:miniSpin 9s linear infinite }
+.env-mini.m2 .em-spin{ animation-duration:7s; animation-direction:reverse }
+.em-f{ position:absolute; inset:0; border:2.5px solid var(--blue); background:rgba(37,68,232,.06) }
+.env-mini.m2 .em-f{ border-color:var(--red); background:rgba(255,75,46,.05) }
+.em-f.f1{ transform:translateZ(35px) } .em-f.f2{ transform:rotateY(180deg) translateZ(35px) }
+.em-f.f3{ transform:rotateY(90deg) translateZ(35px) } .em-f.f4{ transform:rotateY(-90deg) translateZ(35px) }
+.em-f.f5{ transform:rotateX(90deg) translateZ(35px) } .em-f.f6{ transform:rotateX(-90deg) translateZ(35px) }
+@keyframes miniSpin{ from{ transform:rotateX(14deg) rotateY(0deg) } to{ transform:rotateX(14deg) rotateY(360deg) } }
+/* 漂浮色块 */
+.env-dot{ position:absolute; width:12px; height:12px; border:2.5px solid var(--ink); transform-style:preserve-3d }
+.env-dot i{ display:block; width:100%; height:100%; animation:bob 3s ease-in-out infinite alternate }
+.env-dot.d1{ left:36px; top:70px; transform:translate3d(0,0,-110px); background:var(--red) }
+.env-dot.d2{ left:262px; top:54px; transform:translate3d(0,0,-70px); background:var(--blue) }
+.env-dot.d3{ left:252px; top:196px; transform:translate3d(0,0,110px); background:var(--cyan) }
+.env-dot.d4{ left:52px; top:206px; transform:translate3d(0,0,70px); background:var(--yellow) }
+.env-dot.d2 i{ animation-delay:.5s } .env-dot.d3 i{ animation-delay:1s } .env-dot.d4 i{ animation-delay:1.6s }
+@keyframes bob{ from{ transform:translateY(-5px) } to{ transform:translateY(5px) } }
+/* 空间标签 */
+.env-label{
+  position:absolute; font:700 8.5px/1 var(--font-m); letter-spacing:.12em; text-transform:uppercase;
+  background:var(--paper); border:2px solid var(--ink); padding:4px 7px; box-shadow:3px 3px 0 var(--ink); white-space:nowrap;
+}
+.env-label.l1{ left:18px; top:92px; transform:translateZ(170px) rotateY(26deg) }
+.env-label.l2{ left:196px; top:186px; transform:translateZ(-160px) rotateY(-18deg) }
+
+/* --- 电脑新零件：鼠标 / 咖啡杯 / 软盘 / 线缆 / 便利贴 --- */
+.rig-mouse{
+  position:absolute; left:215px; top:246px; width:38px; height:25px;
+  background:var(--paper); border:3px solid var(--ink);
+  transform:rotateX(72deg) rotateZ(-8deg); transform-origin:top;
+}
+.rig-mouse::before{ content:''; position:absolute; left:50%; top:-2px; width:5px; height:11px; margin-left:-2.5px; background:var(--ink); border-radius:2px }
+.rig-mouse::after{ content:''; position:absolute; left:0; right:0; top:12px; border-top:2.5px solid var(--ink) }
+.rig-cup{
+  position:absolute; left:40px; top:248px; width:30px; height:34px;
+  background:var(--red); border:3px solid var(--ink);
+  transform:rotateX(72deg) rotateZ(5deg); transform-origin:top;
+}
+.rig-cup::before{ content:''; position:absolute; right:-17px; top:5px; width:15px; height:19px; border:4px solid var(--ink); border-left:none; border-radius:0 9px 9px 0 }
+.rig-cup::after{ content:''; position:absolute; left:3px; right:3px; top:3px; height:6px; background:rgba(251,249,242,.7) }
+.rig-floppy{
+  position:absolute; left:118px; top:262px; width:30px; height:30px;
+  background:var(--blue); border:3px solid var(--ink);
+  transform:rotateX(72deg) rotateZ(-16deg); transform-origin:top;
+}
+.rig-floppy::before{ content:''; position:absolute; left:3px; right:3px; top:3px; height:13px; background:var(--paper); border:2px solid var(--ink) }
+.rig-cable{
+  position:absolute; left:246px; top:202px; width:54px; height:64px;
+  border:3px solid var(--ink); border-top:none; border-left:none; border-radius:0 0 54px 0;
+  transform:translateZ(-26px) rotateY(-16deg);
+}
+.rig-note{ position:absolute; width:44px; height:44px; transform-style:preserve-3d }
+.rig-note i{
+  display:block; width:100%; height:100%; background:var(--yellow); border:2.5px solid var(--ink);
+  box-shadow:4px 4px 0 rgba(20,20,20,.28); font:700 9px/1.3 var(--font-m); padding:5px 4px; color:var(--ink);
+}
+.rig-note.n1{ left:244px; top:20px } .rig-note.n1 i{ transform:rotate(-7deg) }
+.rig-note.n2{ left:4px; top:48px } .rig-note.n2 i{ transform:rotate(6deg); background:var(--cyan) }
+.rig-note.n3{ left:116px; top:-34px } .rig-note.n3 i{ transform:rotate(-4deg); background:var(--paper) }
+/* 显示器下巴：铭牌 / 扬声器格栅 / 电源灯 */
+.rf-chin{ position:absolute; left:16px; right:16px; bottom:2px; height:14px; display:flex; align-items:center; justify-content:space-between; gap:12px }
+.rf-brand{ font:700 9px/1 var(--font-m); letter-spacing:.14em; color:var(--ink); white-space:nowrap }
+.rf-grille{ width:66px; height:7px; border:2px solid var(--ink); background:repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 6px) }
+.rf-led{ width:9px; height:9px; background:var(--cyan); border:2px solid var(--ink); animation:blink 1.8s steps(2,start) infinite }
+
+/* --- 模态内环境与新零件缩放适配 --- */
+.rig-modal-scene .env{ transform:scale(1.5) }
+.rig-modal-scene .env-floor{ top:279px }
+.rig-modal-scene .rs-edge.top, .rig-modal-scene .rs-edge.bottom{ height:20px }
+.rig-modal-scene .rs-edge.left, .rig-modal-scene .rs-edge.right{ width:20px }
+.rig-modal-scene .rf-brand{ font-size:10px }
+.rig-modal-scene .rig-mouse{ left:280px; top:318px; transform:rotateX(72deg) rotateZ(-8deg) scale(1.28) }
+.rig-modal-scene .rig-cup{ left:48px; top:322px; transform:rotateX(72deg) rotateZ(5deg) scale(1.28) }
+.rig-modal-scene .rig-floppy{ left:152px; top:338px; transform:rotateX(72deg) rotateZ(-16deg) scale(1.28) }
+.rig-modal-scene .rig-cable{ left:322px; top:264px; transform:translateZ(-26px) rotateY(-16deg) scale(1.3) }
+.rig-modal-scene .rig-note{ transform:scale(1.28) }
+.rig-modal-scene .rig-note.n1{ left:316px; top:24px }
+.rig-modal-scene .rig-note.n2{ left:4px; top:62px }
+.rig-modal-scene .rig-note.n3{ left:148px; top:-28px }
+
+@media (max-width:640px){
+  .play-top{ min-height:0 }
+  .magnet-field{ min-height:260px; padding:20px; gap:12px }
+  .rig-scene{ min-height:400px }
+  .rig-view{ padding:56px 12px 64px }
+}
+
+/* 响应式微调 */
+@media (max-width:640px){
+  .sec-head-index{ display:none }
+  .stage-panel{ transform:rotate(0deg) }
+  .stage-stamp{ top:-24px; right:-8px; width:98px; height:98px }
+  .stage-chip{ left:-8px }
+}
+</style>
 </head>
 <body>
 
-<!-- 背景层 -->
-<div class="grain" aria-hidden="true"></div>
-<div class="bg-aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
-<canvas id="starbg" class="starbg" aria-hidden="true"></canvas>
+<div class="noise" aria-hidden="true"></div>
 
-<!-- 加载页 -->
-<div class="loader" id="loader">
-  <div class="loader-mark" aria-hidden="true"><span>A</span><span>G</span></div>
-  <p class="loader-text">正在把想法变成现实<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
-  <div class="loader-bar"><i id="loaderBar"></i></div>
-  <p class="loader-sub">OC 俱乐部 ✦ 用 AI，创造更多可能</p>
+<!-- 启动界面 -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-grid" aria-hidden="true"></div>
+  <div class="loader-deco" aria-hidden="true">
+    <div class="ld-ringwrap"><i class="ld-ring"></i></div>
+    <i class="ld-star s1"></i><i class="ld-star s2"></i><i class="ld-star s3"></i>
+  </div>
+  <i class="ld-corner c1" aria-hidden="true"></i>
+  <i class="ld-corner c2" aria-hidden="true"></i>
+  <i class="ld-corner c3" aria-hidden="true"></i>
+  <i class="ld-corner c4" aria-hidden="true"></i>
+
+  <div class="loader-inner">
+    <div class="ld-meta"><span>OC CLUB / BOOT SEQ</span><span>SYS OK</span></div>
+    <div class="loader-blocks" aria-hidden="true">
+      <span>A</span><i class="ld-plus"></i><span>G</span>
+    </div>
+    <div class="loader-meter">
+      <div class="loader-bar"><i id="loaderBar"></i></div>
+      <b id="loaderPct">00</b>
+    </div>
+    <p class="loader-text" id="loaderState">正在唤醒灵感引擎…</p>
+    <p class="loader-sub">AG × OC CLUB · 用 AI，创造更多可能</p>
+  </div>
+
+  <div class="loader-foot" aria-hidden="true">
+    <span>学习</span><i></i><span>交流</span><i></i><span>实践</span><i></i><span>创造</span>
+  </div>
+
+  <div class="curtain" aria-hidden="true"><i></i><i></i><i></i></div>
 </div>
 
-<!-- 光标 -->
-<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
-<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
-<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
-
-<!-- 顶部 -->
+<!-- 进度条 -->
 <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<!-- 顶栏 -->
 <header class="topbar" id="topbar">
-  <a class="brand" href="#home" data-sfx="hover">
-    <span class="brand-mark">AG</span>
-    <span class="brand-txt">OC 俱乐部<em>一个让想法变成现实的地方</em></span>
+  <a class="brand" href="#home" aria-label="AG OC 俱乐部 回到顶部">
+    <span class="brand-mark" aria-hidden="true">A<em>G</em></span>
+    <span class="brand-txt"><b>AG · OC 俱乐部</b><em>一个让想法变成现实的地方</em></span>
   </a>
   <nav class="nav" aria-label="主导航">
     <a href="#home" class="nav-link is-active">首页</a>
     <a href="#boards" class="nav-link">四大板块</a>
-    <a href="#lab" class="nav-link">灵感实验室</a>
-    <a href="#desk" class="nav-link">工作台</a>
+    <a href="#works" class="nav-link">作品墙</a>
+    <a href="#playground" class="nav-link">灵感创作区</a>
+    <a href="#lab" class="nav-link">灵感发生器</a>
+    <a href="#desk" class="nav-link">贴纸工作台</a>
     <a href="#member" class="nav-link">入场券</a>
   </nav>
   <div class="top-actions">
-    <button class="icon-btn" id="soundBtn" aria-pressed="false" aria-label="声音开关" title="声音开关">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h3.5L13 20V4L7.5 9H4z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="wave2" d="M19 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M4 4l16 16"/></svg>
-    </button>
-    <button class="btn btn-sm btn-primary magnetic" id="posterBtn" data-sfx="click">原版海报</button>
-    <a class="btn btn-sm btn-ghost magnetic" href="#member" data-sfx="click">加入 AG</a>
+    <a class="btn btn-sm btn-primary" href="#member">加入 AG
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
   </div>
 </header>
 
 <main>
-  <!-- ============ HERO ============ -->
-  <section id="home" class="hero">
-    <canvas id="heroFx" class="hero-fx" aria-hidden="true"></canvas>
+<!-- ============ HERO ============ -->
+<section id="home" class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-left reveal" style="--i:0">
+        <div class="hero-tags">
+          <span class="tag tag-y">OC 俱乐部</span>
+          <span class="tag tag-b">EST. 2024</span>
+          <span class="tag">AI × CREATE</span>
+        </div>
+        <h1>
+          <span class="row">把想法</span>
+          <span class="row"><span class="hl-y slant">拍在桌上</span></span>
+          <span class="row">再<span class="hl-i">做成作品</span></span>
+        </h1>
+        <p class="hero-sub">
+          AG 是 OC 俱乐部的创意科技据点——这里不讲课，只动手。
+          从一句话灵感到一张海报、一段代码、一个产品，中间只差<b>一次动手</b>。
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="#lab">去创造点什么
+            <svg class="arr" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn btn-lg" href="#boards">先看看板块</a>
+        </div>
+        <div class="hero-stats" role="list" aria-label="俱乐部数据">
+          <div class="hstat" role="listitem"><b>247</b><span>在册成员</span></div>
+          <div class="hstat" role="listitem"><b>86</b><span>产出作品</span></div>
+          <div class="hstat" role="listitem"><b>13</b><span>进行中项目</span></div>
+          <div class="hstat" role="listitem"><b>∞</b><span>可玩脑洞</span></div>
+        </div>
+      </div>
 
-    <div class="hero-left reveal">
-      <span class="chip">OC 俱乐部 <b>✦</b></span>
-      <h2 class="hero-claim">一个让想法<br><span class="hl">变成现实</span>的地方</h2>
-      <p class="hero-note">从灵感到作品，中间只差一次动手。</p>
-      <div class="hero-neon" aria-hidden="true"><span>AI</span></div>
-      <div class="idea-line" aria-hidden="true">
-        <span>从灵感</span>
-        <i class="idea-arrow"><svg viewBox="0 0 60 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 18C14 6 34 4 50 10"/><path d="M50 10l-7-1M50 10l-3 7"/></svg></i>
-        <span>作品</span>
+      <div class="stage reveal" style="--i:2">
+        <div class="stage-panel">
+          <!-- 旋转圆形徽章 -->
+          <svg class="stage-stamp" viewBox="0 0 120 120" aria-hidden="true">
+            <defs><path id="stampPath" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs>
+            <circle cx="60" cy="60" r="58" fill="#FFD21F" stroke="#141414" stroke-width="3"/>
+            <circle cx="60" cy="60" r="33" fill="#141414"/>
+            <text fill="#141414" font-size="11.5" font-family="'Space Mono',monospace" font-weight="700" letter-spacing="2.5">
+              <textPath href="#stampPath" startOffset="0">用 AI 创造更多可能 · OC 俱乐部 · AG ·</textPath>
+            </text>
+            <path d="M53 47l16 13-16 13z" fill="#FFD21F"/>
+          </svg>
+
+          <div class="ag-word" id="agWord" title="点我试试">
+            <span class="ag-a" role="button" tabindex="0" aria-label="字母 A，点击有惊喜">A</span>
+            <span class="ag-g" role="button" tabindex="0" aria-label="字母 G，点击有惊喜">G</span>
+          </div>
+
+          <div class="stage-chip">POWERED BY IDEAS + AI</div>
+
+          <div class="stage-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="stage" id="stage">
-      <span class="spark s1" aria-hidden="true">✦</span>
-      <span class="spark s2" aria-hidden="true">✧</span>
-      <span class="spark s3" aria-hidden="true">✦</span>
-      <span class="spark s4" aria-hidden="true">⋆</span>
+    <div class="scroll-cue reveal" style="--i:4"><span>SCROLL / 向下滚动</span><i aria-hidden="true"></i></div>
+  </div>
+</section>
 
-      <div class="planet planet-big" aria-hidden="true">
-        <svg viewBox="0 0 220 220">
-          <defs>
-            <radialGradient id="pg" cx="35%" cy="30%" r="75%">
-              <stop offset="0" stop-color="#b6fff2"/><stop offset="45%" stop-color="#35d0e0"/><stop offset="100%" stop-color="#2b7bbd"/>
-            </radialGradient>
-            <linearGradient id="ring" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#ffc857"/><stop offset="1" stop-color="#ff9f43"/>
-            </linearGradient>
-          </defs>
-          <g transform="rotate(-20 110 110)">
-            <ellipse cx="110" cy="110" rx="100" ry="26" fill="none" stroke="url(#ring)" stroke-width="8" opacity=".85"/>
-            <circle cx="110" cy="108" r="44" fill="url(#pg)"/>
-            <path d="M-6 110a100 26 0 0 0 200 0" fill="none" stroke="url(#ring)" stroke-width="8" opacity=".95" transform="translate(0,-2)"/>
-          </g>
-        </svg>
-      </div>
-
-      <div class="planet planet-small" aria-hidden="true"></div>
-
-      <h1 class="hero-ag" id="heroAG" title="点我试试"><span class="ag-a">A</span><span class="ag-g">G</span></h1>
-
-      <p class="hero-sub">用 AI，创造更多可能<span class="bang">！</span></p>
-      <svg class="swoosh" viewBox="0 0 420 40" aria-hidden="true">
-        <defs><linearGradient id="sw" x1="0" x2="1"><stop offset="0" stop-color="#8ef0b0"/><stop offset=".5" stop-color="#4fd6e6"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs>
-        <path d="M6 28C90 8 250 4 414 20" fill="none" stroke="url(#sw)" stroke-width="7" stroke-linecap="round" opacity=".9"/>
-        <path d="M20 36C110 22 260 18 380 30" fill="none" stroke="url(#sw)" stroke-width="3.5" stroke-linecap="round" opacity=".45"/>
-      </svg>
-
-      <div class="hero-cta">
-        <a class="btn btn-primary magnetic" href="#lab" data-sfx="click">
-          去创造点什么 <span class="btn-arrow">→</span>
-        </a>
-        <button class="btn btn-ghost magnetic" id="ideaBtn" data-sfx="click">给我一个灵感</button>
-      </div>
-      <p class="hero-tip"><span class="pulse-dot"></span>点击 AG，看它炸成星星</p>
+<!-- ============ 跑马灯 × 2 ============ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-group">
+      <span>用 AI，创造更多可能</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1l3.2 7.4L23 9.2l-6 5.5 1.7 8-6.7-4.2-6.7 4.2L7 14.7l-6-5.5 7.8-.8z"/></svg>
+      <span>从灵感到作品</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/></svg>
+      <span>学习 · 交流 · 实践 · 创造</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>
+      <span>AG 等你一起探索无限可能</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1l3.2 7.4L23 9.2l-6 5.5 1.7 8-6.7-4.2-6.7 4.2L7 14.7l-6-5.5 7.8-.8z"/></svg>
+      <span>GOOD IDEAS, BETTER WITH AI</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/></svg>
     </div>
-
-    <aside class="hero-right reveal">
-      <p class="hero-right-title">不只是学习<br>更是<span class="hl">创造</span> <span class="smiley">☺</span></p>
-      <ul class="hero-pills">
-        <li class="pill p1">有趣的伙伴</li>
-        <li class="pill p2">实用的技能</li>
-        <li class="pill p3">好玩的项目</li>
-        <li class="pill p4">无限的可能</li>
-      </ul>
-      <div class="hero-stickers" aria-hidden="true">
-        <span>💡</span><span>🚀</span><span>🛸</span>
-      </div>
-      <div class="hero-stamp" aria-hidden="true">
-        <svg viewBox="0 0 120 120">
-          <defs>
-            <path id="stampPath" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/>
-          </defs>
-          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(27,21,51,.16)" stroke-width="1.2" stroke-dasharray="3 6"/>
-          <text>
-            <textPath href="#stampPath" startOffset="0">✦ 用 AI 创造更多可能 · OC 俱乐部 ✦</textPath>
-          </text>
-          <text class="stamp-star" x="60" y="70" text-anchor="middle">✦</text>
-        </svg>
-      </div>
-    </aside>
-
-    <div class="scroll-cue" aria-hidden="true"><span>向下滚动</span><i></i></div>
-  </section>
-
-  <!-- ============ MARQUEE ============ -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track" id="marqueeTrack">
-      <span>用 AI，创造更多可能</span><b>✦</b>
-      <span>从灵感到作品</span><b>✦</b>
-      <span>学习 · 交流 · 实践 · 创造</span><b>✦</b>
-      <span>AG 等你一起探索 AI 的无限可能</span><b>✦</b>
-      <span>Good ideas, better with AI</span><b>✦</b>
+    <div class="marquee-group">
+      <span>用 AI，创造更多可能</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1l3.2 7.4L23 9.2l-6 5.5 1.7 8-6.7-4.2-6.7 4.2L7 14.7l-6-5.5 7.8-.8z"/></svg>
+      <span>从灵感到作品</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/></svg>
+      <span>学习 · 交流 · 实践 · 创造</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>
+      <span>AG 等你一起探索无限可能</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1l3.2 7.4L23 9.2l-6 5.5 1.7 8-6.7-4.2-6.7 4.2L7 14.7l-6-5.5 7.8-.8z"/></svg>
+      <span>GOOD IDEAS, BETTER WITH AI</span>
+      <svg class="mq-star" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/></svg>
     </div>
   </div>
+</div>
+<div class="marquee marquee-2" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-group">
+      <span>IDEA → POSTER</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+      <span>PROMPT → PRODUCT</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+      <span>DRAFT → SHIP</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+      <span>AG INSPIRE LAB</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+    </div>
+    <div class="marquee-group">
+      <span>IDEA → POSTER</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+      <span>PROMPT → PRODUCT</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+      <span>DRAFT → SHIP</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+      <span>AG INSPIRE LAB</span><span class="mq-star" style="font:900 16px/1 var(--font-d)">★</span>
+    </div>
+  </div>
+</div>
 
-  <!-- ============ 四大板块 ============ -->
-  <section id="boards" class="section boards">
-    <div class="wrap">
-      <header class="sec-head reveal">
-        <span class="kicker">✦ 四大板块</span>
-        <h2>不止是听课，<br><span class="grad-text">是当场做出东西</span></h2>
-        <p class="lead">四个方向，四种动手方式。鼠标放上去，它会朝你倾斜。</p>
-      </header>
-
-      <div class="boards-grid" id="boardsGrid">
-        <article class="board-card c1 reveal" data-board="0" tabindex="0" role="button" aria-label="查看 AIGC 教学详情">
-          <div class="card-spot"></div>
-          <div class="card-top">
-            <span class="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.6l5.4 3.4L10 15.4z"/></svg>
-            </span>
-            <span class="card-no">01</span>
-          </div>
-          <h3>AIGC 教学</h3>
-          <ul class="card-list">
-            <li>AI 绘图 / 生成视频</li>
-            <li>文案 / 设计 / 音乐</li>
-            <li>从入门到实战</li>
-          </ul>
-          <div class="card-visual cv-art">
-            <span class="cv-star">✦</span><span class="cv-tag">AI 绘图</span>
-          </div>
-          <span class="card-more">动手看看 <i>→</i></span>
-        </article>
-
-        <article class="board-card c2 reveal" data-board="1" tabindex="0" role="button" aria-label="查看 AI 应用详情">
-          <div class="card-spot"></div>
-          <div class="card-top">
-            <span class="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6"/></svg>
-            </span>
-            <span class="card-no">02</span>
-          </div>
-          <h3>AI 应用</h3>
-          <ul class="card-list">
-            <li>工具使用技巧</li>
-            <li>让 AI 帮你学习 / 工作</li>
-            <li>提升效率与创造力</li>
-          </ul>
-          <div class="card-visual cv-chat">
-            <div class="bubble b1">帮我把周报写得更像人话</div>
-            <div class="bubble b2"><b>AG</b> 收到，已帮你加了点人味儿 ✦</div>
-          </div>
-          <span class="card-more">动手看看 <i>→</i></span>
-        </article>
-
-        <article class="board-card c3 reveal" data-board="2" tabindex="0" role="button" aria-label="查看应用开发详情">
-          <div class="card-spot"></div>
-          <div class="card-top">
-            <span class="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg>
-            </span>
-            <span class="card-no">03</span>
-          </div>
-          <h3>应用开发</h3>
-          <ul class="card-list">
-            <li>低代码 / 小程序</li>
-            <li>Web / App 开发</li>
-            <li>用 AI 打造自己的产品</li>
-          </ul>
-          <div class="card-visual cv-code">
-            <div class="code-line"><b>const</b> idea = <em>ship</em>(<u>'AG'</u>);</div>
-            <div class="code-line dim">// 今天就把点子发上线</div>
-          </div>
-          <span class="card-more">动手看看 <i>→</i></span>
-        </article>
-
-        <article class="board-card c4 reveal" data-board="3" tabindex="0" role="button" aria-label="查看一起创造详情">
-          <div class="card-spot"></div>
-          <div class="card-top">
-            <span class="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6V17h5.4v-1.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg>
-            </span>
-            <span class="card-no">04</span>
-          </div>
-          <h3>一起创造</h3>
-          <ul class="card-list">
-            <li>个人 &amp; 团队项目</li>
-            <li>AI 创意挑战</li>
-            <li>把想法变成作品</li>
-          </ul>
-          <div class="card-visual cv-shots">
-            <i class="shot1"></i><i class="shot2"></i><span class="cv-heart">♥</span>
-          </div>
-          <span class="card-more">动手看看 <i>→</i></span>
-        </article>
+<!-- ============ 四大板块 ============ -->
+<section id="boards" class="section">
+  <div class="wrap">
+    <header class="sec-head reveal" style="--i:0">
+      <div class="sec-head-main">
+        <span class="kicker"><i aria-hidden="true"></i>四大板块 / SECTORS</span>
+        <h2>不止是听课，<br>是当场<span class="mark">做出东西</span></h2>
+        <p class="lead">四个方向，四种动手方式。每个板块都遵循同一条铁律：离场时，手里必须有东西。</p>
       </div>
+      <div class="sec-head-index">SEC.<b>01</b></div>
+    </header>
 
-      <div class="board-foot reveal">
-        <span>学习</span><b>✦</b><span>交流</span><b>✦</b><span>实践</span><b>✦</b><span>创造</span>
+    <div class="boards-grid">
+      <article class="board-card c-y reveal" style="--i:1" data-board="0" tabindex="0" role="button" aria-label="查看 AIGC 教学详情">
+        <div class="bc-bar" aria-hidden="true"></div>
+        <div class="bc-top">
+          <span class="bc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.6l5.4 3.4L10 15.4z"/></svg>
+          </span>
+          <span class="bc-no" aria-hidden="true">01</span>
+        </div>
+        <h3>AIGC 教学</h3>
+        <ul class="bc-list">
+          <li>AI 绘图 / 生成视频全流程</li>
+          <li>文案 / 设计 / 音乐跨界实验</li>
+          <li>从零基础到能交付的实战课</li>
+        </ul>
+        <div class="bc-visual" aria-hidden="true">
+          <div class="bcv bcv-art"><span class="disc"><i></i></span><span class="tri"></span></div>
+        </div>
+        <span class="bc-more">动手看看
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </article>
+
+      <article class="board-card reveal" style="--i:2" data-board="1" tabindex="0" role="button" aria-label="查看 AI 应用详情">
+        <div class="bc-bar" aria-hidden="true"></div>
+        <div class="bc-top">
+          <span class="bc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6"/></svg>
+          </span>
+          <span class="bc-no" aria-hidden="true">02</span>
+        </div>
+        <h3>AI 应用</h3>
+        <ul class="bc-list">
+          <li>工具链使用与组合技巧</li>
+          <li>让 AI 帮你学习、写稿、干活</li>
+          <li>效率与创造力双倍放大</li>
+        </ul>
+        <div class="bc-visual" aria-hidden="true">
+          <div class="bcv bcv-chat">
+            <i>&gt; 帮周报加点人味儿</i>
+            <i>AG: 已注入 3 克幽默</i>
+          </div>
+        </div>
+        <span class="bc-more">动手看看
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </article>
+
+      <article class="board-card reveal" style="--i:3" data-board="2" tabindex="0" role="button" aria-label="查看应用开发详情">
+        <div class="bc-bar" aria-hidden="true"></div>
+        <div class="bc-top">
+          <span class="bc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg>
+          </span>
+          <span class="bc-no" aria-hidden="true">03</span>
+        </div>
+        <h3>应用开发</h3>
+        <ul class="bc-list">
+          <li>低代码 / 小程序快速起步</li>
+          <li>Web / App 全栈路线</li>
+          <li>用 AI 打造自己的产品</li>
+        </ul>
+        <div class="bc-visual" aria-hidden="true">
+          <div class="bcv bcv-code"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <span class="bc-more">动手看看
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </article>
+
+      <article class="board-card reveal" style="--i:4" data-board="3" tabindex="0" role="button" aria-label="查看一起创造详情">
+        <div class="bc-bar" aria-hidden="true"></div>
+        <div class="bc-top">
+          <span class="bc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6V17h5.4v-1.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg>
+          </span>
+          <span class="bc-no" aria-hidden="true">04</span>
+        </div>
+        <h3>一起创造</h3>
+        <ul class="bc-list">
+          <li>个人 &amp; 团队项目孵化</li>
+          <li>48 小时 AI 创意挑战赛</li>
+          <li>把想法变成拿得出手的作品</li>
+        </ul>
+        <div class="bc-visual" aria-hidden="true">
+          <div class="bcv bcv-collage"><i></i><i></i><i></i><span class="plus">+</span></div>
+        </div>
+        <span class="bc-more">动手看看
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </article>
+    </div>
+
+    <div class="board-foot reveal" style="--i:5">
+      <span>学习</span><b aria-hidden="true"></b><span>交流</span><b aria-hidden="true"></b><span>实践</span><b aria-hidden="true"></b><span>创造</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 作品墙 ============ -->
+<section id="works" class="section">
+  <div class="wrap">
+    <header class="sec-head reveal" style="--i:0">
+      <div class="sec-head-main">
+        <span class="kicker"><i aria-hidden="true"></i>作品墙 / GALLERY</span>
+        <h2>俱乐部的墙上，<br>钉满了<span class="mark mark-blue">别人的想法</span></h2>
+        <p class="lead">全部由成员在活动现场产出。下一张空位，留给还没动手的你。</p>
+      </div>
+      <div class="sec-head-index">SEC.<b>02</b></div>
+    </header>
+
+    <div class="gallery-grid">
+      <figure class="g-item reveal" style="--i:1">
+        <span class="g-tag">AIGC 海报</span>
+        <picture>
+          <img src="https://picsum.photos/seed/ag-club-poster/900/700.jpg" alt="成员生成的演出海报设计作品" loading="lazy">
+        </picture>
+        <figcaption class="g-cap"><b>「校园乐队招募」海报</b><span>BY 陆知远 / 03</span></figcaption>
+      </figure>
+      <figure class="g-item reveal" style="--i:2">
+        <span class="g-tag">插画</span>
+        <picture>
+          <img src="https://picsum.photos/seed/ag-club-illust/700/520.jpg" alt="AI 生成风格的插画作品" loading="lazy">
+        </picture>
+        <figcaption class="g-cap"><b>机械花园 No.7</b><span>BY 苏珂 / 11</span></figcaption>
+      </figure>
+      <figure class="g-item reveal" style="--i:3">
+        <span class="g-tag">短视频</span>
+        <picture>
+          <img src="https://picsum.photos/seed/ag-club-video/560/520.jpg" alt="AI 生成短视频的分镜画面" loading="lazy">
+        </picture>
+        <figcaption class="g-cap"><b>60 秒城市漫游</b><span>BY 邱野 / 27</span></figcaption>
+      </figure>
+      <figure class="g-item reveal" style="--i:4">
+        <span class="g-tag">小程序</span>
+        <picture>
+          <img src="https://picsum.photos/seed/ag-club-app/560/300.jpg" alt="成员开发的社团活动报名小程序界面" loading="lazy">
+        </picture>
+        <figcaption class="g-cap"><b>活动报名小程序</b><span>TEAM 蓝鲸 / 04</span></figcaption>
+      </figure>
+      <figure class="g-item reveal" style="--i:5">
+        <span class="g-tag">音乐</span>
+        <picture>
+          <img src="https://picsum.photos/seed/ag-club-music/700/520.jpg" alt="AI 辅助创作的音乐专辑封面" loading="lazy">
+        </picture>
+        <figcaption class="g-cap"><b>《故障电台》EP 封面</b><span>BY 白一苇 / 18</span></figcaption>
+      </figure>
+      <figure class="g-item reveal" style="--i:6">
+        <span class="g-tag">工作坊</span>
+        <picture>
+          <img src="https://picsum.photos/seed/ag-club-ws/900/300.jpg" alt="俱乐部线下工作坊现场照片" loading="lazy">
+        </picture>
+        <figcaption class="g-cap"><b>第 14 期动手夜现场</b><span>PHOTO BY 组委会</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 灵感创作区 ============ -->
+<section id="playground" class="section">
+  <div class="wrap">
+    <header class="sec-head reveal" style="--i:0">
+      <div class="sec-head-main">
+        <span class="kicker"><i aria-hidden="true"></i>灵感创作区 / PLAYGROUND</span>
+        <h2>先玩起来，<br>灵感自己会<span class="mark">找上门</span></h2>
+        <p class="lead">把鼠标当磁铁推开字母墙，再把那台悬浮在几何空间里的 3D 一号机拖起来转、缩放看细节——不满意就一键打碎，再亲手重组回去。</p>
+      </div>
+      <div class="sec-head-index">SEC.<b>03</b></div>
+    </header>
+
+    <!-- 磁吸字母墙 + 粒子画布 -->
+    <div class="play-top reveal" style="--i:1">
+      <aside class="play-side">
+        <h3>磁吸<br>字母墙</h3>
+        <p>鼠标 / 手指靠近，字母块会被推开又弹回来。每一块都是一个被反复揉搓的想法。</p>
+        <div class="ps-data" aria-hidden="true">
+          <span>PHYSICS / 弹簧系数</span><b>K = 0.082</b>
+          <span>DAMPING / 阻尼</span><b>0.86</b>
+          <span>IDEAS LOADED</span><b id="mgCount">12 块</b>
+        </div>
+      </aside>
+      <div class="magnet-wrap" id="magnetWrap">
+        <canvas id="magnetCanvas" aria-hidden="true"></canvas>
+        <div class="magnet-field" id="magnetField" aria-label="可交互的字母墙，鼠标划过可推动字母块"></div>
+        <span class="magnet-hint" id="magnetHint">MOVE ME / 鼠标扫过字母试试</span>
       </div>
     </div>
-  </section>
 
-  <!-- ============ 灵感实验室 ============ -->
-  <section id="lab" class="section lab">
-    <div class="wrap">
-      <header class="sec-head reveal">
-        <span class="kicker">✦ 灵感实验室</span>
-        <h2>给 AG 一句话，<br><span class="grad-text">它还你一张作品</span></h2>
-        <p class="lead">这不是真的 AI 出图——是本地绘制的「灵感样本」。但它会证明：一个好点子，值得先被看见。</p>
-      </header>
+    <!-- 3D 电脑 -->
+    <div class="play-lab">
+      <div class="lab-notes reveal" style="--i:1">
+        <div class="note-card">
+          <b><i style="background:var(--yellow)" aria-hidden="true"></i>AG 的一号机</b>
+          <p>纯 CSS 拼出来的 3D 机器，悬浮在网格几何空间里：虚线包围立方、网格地面、两条轨道环、漂浮的小立方与色块。屏幕里的代码正在滚动——那是成员们当晚要交的活。</p>
+        </div>
+        <div class="note-card">
+          <b><i style="background:var(--blue)" aria-hidden="true"></i>怎么玩</b>
+          <p>拖动 360° 旋转、滚轮缩放；点「放大查看」凑近看每个零件——鼠标、咖啡杯、软盘、便利贴一个不少。心情不好就点「打碎它」，零件全部炸开，还能一键重组。</p>
+        </div>
+        <div class="note-card">
+          <b><i style="background:var(--red)" aria-hidden="true"></i>闲时会自转</b>
+          <p>不碰它的时候，它会慢慢自己转起来——像在等人回来继续干活。</p>
+        </div>
+        <div class="play-lab-actions">
+          <button class="btn btn-sm" id="mgBoostBtn" type="button">喷发一波灵感</button>
+          <button class="btn btn-sm btn-ink" id="mgResetBtn" type="button">字母归位</button>
+        </div>
+      </div>
 
-      <div class="lab-grid">
-        <div class="lab-panel reveal">
-          <label class="field">
-            <span class="field-label">你的灵感</span>
-            <input id="ideaInput" class="input" maxlength="28" placeholder="比如：用 AI 做一张校园乐队招募海报" autocomplete="off">
-          </label>
+      <div class="rig-scene reveal" style="--i:2" id="rigScene" aria-label="3D 电脑模型，可拖拽旋转和滚轮缩放">
+        <i class="rs-corner c1" aria-hidden="true"></i><i class="rs-corner c2" aria-hidden="true"></i>
+        <i class="rs-corner c3" aria-hidden="true"></i><i class="rs-corner c4" aria-hidden="true"></i>
+        <span class="rig-tip" id="rigTip">DRAG TO ROTATE / 拖我转起来</span>
+        <div class="rig-view">
+          <div class="rig" id="rigMain"><!-- JS 注入 3D 结构 --></div>
+        </div>
+        <div class="rig-bar">
+        <span class="rig-readout">ROT <b id="rigRotOut">Y 018° X 012°</b> · ZOOM <b id="rigZoomOut">1.00×</b> · MODE <b id="rigModeOut">组装</b></span>
+        <div class="rig-btns">
+          <button class="btn btn-sm" id="rigSpinBtn" type="button">转一圈</button>
+          <button class="btn btn-sm btn-ink" id="rigBreakBtn" type="button">打碎它</button>
+          <button class="btn btn-sm btn-primary" id="rigZoomBtn" type="button">放大查看</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-          <div class="field">
-            <span class="field-label">想要的形式</span>
-            <div class="chips" id="styleChips" role="group" aria-label="作品形式">
-              <button class="chip-btn is-on" data-style="poster">海报</button>
-              <button class="chip-btn" data-style="illust">插画</button>
-              <button class="chip-btn" data-style="code">代码</button>
-              <button class="chip-btn" data-style="video">短视频</button>
-              <button class="chip-btn" data-style="music">音乐</button>
-            </div>
-          </div>
+<!-- ============ 灵感发生器 ============ -->
+<section id="lab" class="section">
+  <div class="wrap">
+    <header class="sec-head reveal" style="--i:0">
+      <div class="sec-head-main">
+        <span class="kicker"><i aria-hidden="true"></i>灵感发生器 / INSPIRE LAB</span>
+        <h2>给 AG 一句话，<br>它还你一张<span class="mark">粗野海报</span></h2>
+        <p class="lead">这不是真的 AI 出图——是浏览器本地绘制的灵感样本。但它会证明一件事：一个好点子，值得先被看见。</p>
+      </div>
+      <div class="sec-head-index">SEC.<b>04</b></div>
+    </header>
 
-          <div class="field">
-            <span class="field-label">灵感浓度</span>
-            <input type="range" id="density" min="10" max="100" value="68" class="range">
-            <div class="range-scale"><span>朴素</span><span>炸裂</span></div>
-          </div>
-
-          <div class="lab-actions">
-            <button class="btn btn-primary magnetic" id="generateBtn" data-sfx="click">
-              <span class="btn-label">把灵感变成作品</span><span class="btn-arrow">✦</span>
-            </button>
-            <button class="btn btn-ghost" id="diceBtn" data-sfx="click" title="随机一个灵感">🎲 换个灵感</button>
-          </div>
-          <p class="tiny-note">小提示：先在下面「灵感浓度」拉满，再点生成，效果最明显。</p>
+    <div class="lab-grid">
+      <div class="panel reveal" style="--i:1">
+        <div class="panel-title">
+          <span>INPUT / 输入台</span>
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
         </div>
 
-        <div class="lab-stage reveal">
-          <div class="artifact">
-            <div class="artifact-frame">
-              <canvas id="artCanvas" width="600" height="800" aria-label="生成的灵感作品"></canvas>
-              <div class="artifact-sheen" aria-hidden="true"></div>
-              <span class="artifact-badge" id="artBadge">AG · POSTER</span>
-            </div>
-            <div class="artifact-info">
-              <div class="type-out" id="typeOut"></div>
-              <div class="artifact-tags" id="artTags"></div>
-            </div>
-            <div class="artifact-actions">
-              <button class="btn btn-sm btn-ghost" id="downloadBtn" data-sfx="click">下载这张</button>
-              <button class="btn btn-sm btn-ghost" id="bigArtBtn" data-sfx="click">看大图</button>
-            </div>
+        <label class="field">
+          <span class="field-label"><b>01</b> / 你的灵感</span>
+          <input id="ideaInput" class="input" maxlength="20" placeholder="比如：用 AI 做一张校园乐队招募海报" autocomplete="off">
+        </label>
+
+        <div class="field">
+          <span class="field-label"><b>02</b> / 想要的形式</span>
+          <div class="chips" id="styleChips" role="group" aria-label="作品形式">
+            <button class="chip-btn is-on" data-style="poster" type="button">海报</button>
+            <button class="chip-btn" data-style="illust" type="button">插画</button>
+            <button class="chip-btn" data-style="code" type="button">代码</button>
+            <button class="chip-btn" data-style="video" type="button">短视频</button>
+            <button class="chip-btn" data-style="music" type="button">音乐</button>
           </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label"><b>03</b> / 灵感浓度</span>
+          <div class="range-row">
+            <input type="range" id="density" min="10" max="100" value="68" class="range" aria-label="灵感浓度">
+          </div>
+          <div class="range-scale"><span>朴素</span><span>炸裂</span></div>
+        </div>
+
+        <div class="lab-actions">
+          <button class="btn btn-primary" id="generateBtn" type="button">
+            <span>把灵感变成作品</span>
+            <svg class="arr" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <button class="btn" id="diceBtn" type="button" title="随机一个灵感">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/></svg>
+            <span>换个灵感</span>
+          </button>
+        </div>
+        <p class="tiny-note">TIP：把「灵感浓度」拉满再点生成，墨会溅得更有性格。所有绘制均在本地完成，不上传任何信息。</p>
+      </div>
+
+      <div class="lab-stage reveal" style="--i:2">
+        <div class="artifact-frame">
+          <canvas id="artCanvas" width="640" height="840" aria-label="生成的灵感海报"></canvas>
+          <span class="artifact-badge" id="artBadge">AG · POSTER</span>
           <div class="gen-overlay" id="genOverlay" aria-hidden="true">
-            <div class="gen-ring"></div>
-            <p>AG 正在把想法拼起来…</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 工作台 ============ -->
-  <section id="desk" class="section desk">
-    <div class="wrap">
-      <header class="sec-head reveal">
-        <span class="kicker">✦ 灵感工作台</span>
-        <h2>随手拖，<br><span class="grad-text">把它摆成你的样子</span></h2>
-        <p class="lead">拖拽贴纸、双击转角度、松手有惯性。这里是 AG 的桌面，也是你的。</p>
-      </header>
-
-      <div class="desk-panel reveal" id="deskPanel">
-        <div class="desk-grid" aria-hidden="true"></div>
-        <div class="desk-hint" id="deskHint">🖐 拖动这些贴纸 → 布置你的工作台</div>
-        <div class="desk-items" id="deskItems"></div>
-        <div class="desk-bar">
-          <span class="desk-count" id="deskCount">贴纸 10 张</span>
-          <div class="desk-btns">
-            <button class="btn btn-sm btn-ghost" id="shuffleBtn" data-sfx="click">随机打乱</button>
-            <button class="btn btn-sm btn-ghost" id="resetDeskBtn" data-sfx="click">复原</button>
-          </div>
-        </div>
-      </div>
-      <p class="tiny-note center">双击贴纸可以转 15°，长按屏幕也能拖。够无聊的时候，把所有贴纸堆到中间试试。</p>
-    </div>
-  </section>
-
-  <!-- ============ 入场券 ============ -->
-  <section id="member" class="section member">
-    <div class="wrap">
-      <header class="sec-head reveal">
-        <span class="kicker">✦ 入场券</span>
-        <h2>写个名字，<br><span class="grad-text">领一张 AG 会员卡</span></h2>
-        <p class="lead">纯本地绘制，不会上传任何信息。生成后可以直接下载带走。</p>
-      </header>
-
-      <div class="member-grid">
-        <div class="member-form reveal">
-          <label class="field">
-            <span class="field-label">你的名字 / 昵称</span>
-            <input id="nameInput" class="input" maxlength="12" value="新朋友" autocomplete="off" placeholder="输入名字">
-          </label>
-          <div class="field">
-            <span class="field-label">你的身份</span>
-            <div class="chips" id="roleChips" role="group" aria-label="身份">
-              <button class="chip-btn is-on" data-role="学习者">学习者</button>
-              <button class="chip-btn" data-role="创作者">创作者</button>
-              <button class="chip-btn" data-role="开发者">开发者</button>
-              <button class="chip-btn" data-role="探索者">探索者</button>
+            <div class="gen-box">
+              <div class="gen-blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <p>AG 正在把想法拼起来…</p>
             </div>
           </div>
-          <div class="serial-row">
-            <span>卡号</span><b id="serialOut">AG-0000-0000</b>
-          </div>
-          <div class="member-actions">
-            <button class="btn btn-primary magnetic" id="downloadCardBtn" data-sfx="click">下载会员卡 <span class="btn-arrow">↓</span></button>
-            <button class="btn btn-ghost" id="randomNameBtn" data-sfx="click">随机一个</button>
-          </div>
-          <p class="tiny-note">每个人都是 AG 的一部分。真的。</p>
         </div>
-
-        <div class="member-preview reveal">
-          <div class="card-halo"></div>
-          <canvas id="memberCanvas" width="760" height="460" aria-label="AG 会员卡预览"></canvas>
-          <button class="card-flip" id="flipCardBtn" data-sfx="click">↻ 翻个面</button>
+        <div class="artifact-info">
+          <div class="type-out" id="typeOut"></div>
+          <div class="artifact-tags" id="artTags">
+            <span>LOCAL-ONLY</span><span>NEO-BRUTAL</span><span>V1.4</span>
+          </div>
+        </div>
+        <div class="artifact-actions">
+          <button class="btn btn-sm" id="downloadBtn" type="button">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg>
+            <span>下载这张</span>
+          </button>
+          <button class="btn btn-sm btn-ink" id="regenBtn" type="button">再抽一版</button>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ============ JOIN ============ -->
-  <section id="join" class="section join">
-    <div class="wrap join-wrap">
-      <p class="join-kicker reveal">如果你也想用 AI 做点什么</p>
-      <h2 class="join-title reveal"><span class="grad-text">那就来 AG 吧！</span></h2>
-      <p class="join-sub reveal">AG 等你一起，探索 AI 的无限可能。</p>
-      <div class="join-cta reveal">
-        <a class="btn btn-primary btn-lg magnetic" href="#member" data-sfx="click">领取我的入场券</a>
-        <button class="btn btn-ghost btn-lg magnetic" id="posterBtn2" data-sfx="click">看看原版海报</button>
+<!-- ============ 贴纸工作台 ============ -->
+<section id="desk" class="section">
+  <div class="wrap">
+    <header class="sec-head reveal" style="--i:0">
+      <div class="sec-head-main">
+        <span class="kicker"><i aria-hidden="true"></i>贴纸工作台 / DESK</span>
+        <h2>随手拖拽，<br>把它摆成<span class="mark">你的样子</span></h2>
+        <p class="lead">拖动贴纸、双击转 15°、松手带一点惯性。这里是 AG 的桌面，现在也是你的。</p>
       </div>
-      <p class="join-foot reveal">学习 ✦ 交流 ✦ 实践 ✦ 创造</p>
+      <div class="sec-head-index">SEC.<b>05</b></div>
+    </header>
+
+    <div class="desk-panel reveal" style="--i:1" id="deskPanel">
+      <div class="desk-hint" id="deskHint">DRAG ME / 拖动贴纸，布置你的工作台</div>
+      <div class="desk-items" id="deskItems"></div>
+      <div class="desk-bar">
+        <span class="desk-count" id="deskCount">贴纸 × 10</span>
+        <div class="desk-btns">
+          <button class="btn btn-sm" id="shuffleBtn" type="button">随机打乱</button>
+          <button class="btn btn-sm btn-ink" id="resetDeskBtn" type="button">复原</button>
+        </div>
+      </div>
     </div>
-    <div class="join-orbit" aria-hidden="true">
-      <i>✦</i><i>✧</i><i>✦</i><i>⋆</i><i>✦</i>
+    <p class="tiny-note center">双击贴纸可以旋转 15°；触屏也可以直接拖。够无聊的时候，试试把所有贴纸堆到同一个角上。</p>
+  </div>
+</section>
+
+<!-- ============ 入场券 / 会员卡 ============ -->
+<section id="member" class="section">
+  <div class="wrap">
+    <header class="sec-head reveal" style="--i:0">
+      <div class="sec-head-main">
+        <span class="kicker"><i aria-hidden="true"></i>入场券 / MEMBER CARD</span>
+        <h2>写个名字，<br>领一张 AG <span class="mark mark-blue">会员卡</span></h2>
+        <p class="lead">纯本地绘制，不会上传任何信息。生成后可以直接下载带走，或者翻到背面看看俱乐部公约。</p>
+      </div>
+      <div class="sec-head-index">SEC.<b>06</b></div>
+    </header>
+
+    <div class="member-grid">
+      <div class="panel reveal" style="--i:1">
+        <div class="panel-title">
+          <span>REGISTRATION / 登记处</span>
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+
+        <label class="field">
+          <span class="field-label"><b>01</b> / 你的名字或昵称</span>
+          <input id="nameInput" class="input" maxlength="10" value="新朋友" autocomplete="off" placeholder="输入名字">
+        </label>
+
+        <div class="field">
+          <span class="field-label"><b>02</b> / 你的身份</span>
+          <div class="chips" id="roleChips" role="group" aria-label="身份选择">
+            <button class="chip-btn is-on" data-role="学习者" type="button">学习者</button>
+            <button class="chip-btn" data-role="创作者" type="button">创作者</button>
+            <button class="chip-btn" data-role="开发者" type="button">开发者</button>
+            <button class="chip-btn" data-role="探索者" type="button">探索者</button>
+          </div>
+        </div>
+
+        <div class="serial-row">
+          <span>卡号 / NO.</span>
+          <b id="serialOut">AG-0000-0000</b>
+        </div>
+
+        <div class="member-actions">
+          <button class="btn btn-primary" id="downloadCardBtn" type="button">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg>
+            <span>下载会员卡</span>
+          </button>
+          <button class="btn" id="randomNameBtn" type="button">随机一个</button>
+        </div>
+        <p class="tiny-note">每个人都是 AG 的一部分。真的——卡号里藏着你的入场序号。</p>
+      </div>
+
+      <div class="member-preview reveal" style="--i:2">
+        <div class="card-scene">
+          <div class="card-flipper" id="cardFlipper">
+            <div class="card-face front">
+              <canvas id="memberCanvas" width="760" height="460" aria-label="AG 会员卡正面"></canvas>
+            </div>
+            <div class="card-face back">
+              <canvas id="memberCanvasBack" width="760" height="460" aria-label="AG 会员卡背面"></canvas>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-sm card-flip-btn" id="flipCardBtn" type="button">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2"/><path d="M18 3v3.5h-3.5M6 21v-3.5h3.5"/></svg>
+          <span>翻个面</span>
+        </button>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- ============ JOIN CTA ============ -->
+<section id="join" class="section join">
+  <div class="wrap">
+    <div class="join-orbit" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="join-kicker reveal" style="--i:0">IF YOU WANT TO BUILD SOMETHING</p>
+    <h2 class="reveal" style="--i:1">如果你也想用 AI<br>做点什么——<span class="mk-y">那就来 AG 吧</span></h2>
+    <p class="join-sub reveal" style="--i:2">不用先学会，只需要先开始。AG 等你一起，探索 AI 的无限可能。</p>
+    <div class="join-cta reveal" style="--i:3">
+      <a class="btn btn-primary btn-lg" href="#member" id="joinBtn">领取我的入场券
+        <svg class="arr" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="btn btn-lg btn-ghost" href="#lab">先玩玩灵感发生器</a>
+    </div>
+    <p class="join-foot reveal" style="--i:4">学习 / 交流 / 实践 / 创造 —— SINCE 2024</p>
+  </div>
+</section>
 </main>
 
+<!-- ============ FOOTER ============ -->
 <footer class="footer">
-  <div class="wrap footer-inner">
-    <div class="footer-brand">
-      <span class="brand-mark">AG</span>
-      <p>OC 俱乐部 · 一个让想法变成现实的地方</p>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="brand-mark" aria-hidden="true">A<em>G</em></span>
+        <div>
+          <b style="font:900 18px/1.4 var(--font-d); color:var(--paper)">AG · OC 俱乐部</b>
+          <p style="margin-top:8px">一个让想法变成现实的地方。用 AI，创造更多可能。页面里的一切作品与卡号，均由你的浏览器当场绘制。</p>
+        </div>
+      </div>
+      <nav class="footer-links" aria-label="页脚导航">
+        <a href="#home">回到顶部 / TOP</a>
+        <a href="#boards">四大板块 / SECTORS</a>
+        <a href="#works">作品墙 / GALLERY</a>
+        <a href="#playground">灵感创作区 / PLAYGROUND</a>
+        <a href="#lab">灵感发生器 / LAB</a>
+        <a href="#desk">贴纸工作台 / DESK</a>
+        <a href="#member">入场券 / CARD</a>
+      </nav>
     </div>
-    <div class="footer-links">
-      <a href="#home">回到顶部</a>
-      <a href="#boards">四大板块</a>
-      <a href="#lab">灵感实验室</a>
-      <a href="#member">入场券</a>
+    <div class="footer-fine">
+      <span>© 2024-2026 AG × OC CLUB · ALL IDEAS RESERVED</span>
+      <span>BUILT WITH VANILLA HTML/CSS/JS · NEO-BRUTALIST EDITION</span>
     </div>
-    <p class="footer-fine">页面里的作品、卡号均由浏览器本地生成 · 想再做点别的？把想法丢给 AG。</p>
   </div>
 </footer>
 
-<!-- 弹层 -->
-<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
+<!-- ============ 板块详情弹层 ============ -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-backdrop" data-close></div>
   <div class="modal-card" role="document">
-    <button class="modal-close" data-close aria-label="关闭">✕</button>
+    <button class="modal-close" data-close aria-label="关闭弹层">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
     <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+<!-- ============ 3D 放大查看模态 ============ -->
+<div class="rig-modal" id="rigModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="3D 电脑放大查看">
+  <div class="modal-backdrop" data-rigclose></div>
+  <div class="rig-modal-card" role="document">
+    <div class="rig-modal-head">
+      <div>
+        <b>AG UNIT-01 / 一号机</b>
+        <span> · ZOOM VIEW · 拖拽旋转 · 滚轮缩放</span>
+      </div>
+      <button class="modal-close" data-rigclose aria-label="关闭放大查看">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="rig-modal-scene" id="rigModalScene" aria-label="放大的 3D 电脑模型，可拖拽旋转和滚轮缩放">
+      <div class="rig-view">
+        <div class="rig" id="rigZoom"><!-- JS 注入 --></div>
+      </div>
+      <div class="rig-modal-foot">
+        <span class="rig-readout">ROT <b id="rigZoomRotOut">Y 018° X 012°</b> · ZOOM <b id="rigZoomZoomOut">1.40×</b> · MODE <b id="rigZoomModeOut">组装</b></span>
+        <div class="rig-btns">
+          <button class="btn btn-sm btn-ink" id="rigZoomBreakBtn" type="button">打碎它</button>
+          <button class="btn btn-sm" id="rigBackBtn" type="button">看背面</button>
+          <button class="btn btn-sm" id="rigFrontBtn" type="button">回正面</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<script src="app.js" defer></script>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+<script>
+/* ============================================================
+   AG · OC CLUB — 交互引擎（原生 JS，零依赖）
+   ============================================================ */
+(function(){
+'use strict';
+
+/* === 工具函数 === */
+const $  = (s, c) => (c || document).querySelector(s);
+const $$ = (s, c) => Array.from((c || document).querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const rand  = (a, b) => a + Math.random() * (b - a);
+const pick  = arr => arr[Math.floor(Math.random() * arr.length)];
+
+/* 可复现随机（海报生成用） */
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* 设计令牌（与 CSS 同步） */
+const INK = '#141414', PAPER = '#FBF9F2', YELLOW = '#FFD21F',
+      BLUE = '#2544E8', RED = '#FF4B2E', CYAN = '#19B8A6';
+const FONT_D = '"Archivo Black","Noto Sans SC","Microsoft YaHei",sans-serif';
+const FONT_M = '"Space Mono","Microsoft YaHei",monospace';
+
+/* === Toast === */
+const toastEl = $('#toast');
+let toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('is-on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 2600);
+}
+
+/* === 彩带引擎（全屏 canvas，点击爆发）=== */
+const confCanvas = $('#confetti');
+const cctx = confCanvas.getContext('2d');
+let confPieces = [], confRunning = false;
+function confResize(){
+  confCanvas.width = innerWidth * devicePixelRatio;
+  confCanvas.height = innerHeight * devicePixelRatio;
+  confCanvas.style.width = innerWidth + 'px';
+  confCanvas.style.height = innerHeight + 'px';
+  cctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+confResize();
+addEventListener('resize', confResize, { passive: true });
+
+function burst(x, y, count){
+  const colors = [YELLOW, BLUE, RED, CYAN, INK];
+  for(let i = 0; i < count; i++){
+    const ang = rand(0, Math.PI * 2), spd = rand(4, 13);
+    confPieces.push({
+      x, y,
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 4,
+      w: rand(6, 13), h: rand(6, 13),
+      rot: rand(0, Math.PI * 2), vr: rand(-.25, .25),
+      color: pick(colors),
+      life: 1, decay: rand(.008, .016),
+      shape: Math.random() < .3 ? 'circle' : 'rect'
+    });
+  }
+  if(!confRunning){ confRunning = true; requestAnimationFrame(confTick); }
+}
+function confTick(){
+  cctx.clearRect(0, 0, innerWidth, innerHeight);
+  confPieces = confPieces.filter(p => p.life > 0 && p.y < innerHeight + 40);
+  for(const p of confPieces){
+    p.vy += .32; p.vx *= .985; p.vy *= .985;
+    p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= p.decay;
+    cctx.save();
+    cctx.globalAlpha = clamp(p.life, 0, 1);
+    cctx.translate(p.x, p.y); cctx.rotate(p.rot);
+    cctx.fillStyle = p.color; cctx.strokeStyle = INK; cctx.lineWidth = 1.5;
+    if(p.shape === 'circle'){
+      cctx.beginPath(); cctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+      cctx.fill(); cctx.stroke();
+    }else{
+      cctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      cctx.strokeRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    }
+    cctx.restore();
+  }
+  if(confPieces.length){ requestAnimationFrame(confTick); }
+  else{ confRunning = false; cctx.clearRect(0, 0, innerWidth, innerHeight); }
+}
+
+/* === 启动界面 === */
+const loader = $('#loader'), loaderBar = $('#loaderBar');
+const loaderPct = $('#loaderPct'), loaderState = $('#loaderState');
+const LOAD_STATES = ['正在唤醒灵感引擎…', '校准弹簧与几何…', '把想法压进画布…', '最后一件事：准备上线'];
+document.body.style.overflow = 'hidden';
+let lp = 0;
+const loadTimer = setInterval(() => {
+  lp = Math.min(100, lp + rand(8, 20));
+  loaderBar.style.width = lp + '%';
+  if(loaderPct) loaderPct.textContent = String(Math.round(lp)).padStart(2, '0');
+  if(loaderState){
+    loaderState.textContent = LOAD_STATES[Math.min(LOAD_STATES.length - 1, Math.floor(lp / 26))];
+  }
+  if(lp >= 100){
+    clearInterval(loadTimer);
+    if(loaderState) loaderState.textContent = 'READY / 欢迎加入 AG';
+    setTimeout(() => {
+      loader.classList.add('is-done');
+      document.body.style.overflow = '';
+      setTimeout(() => loader.remove(), 1350);
+    }, 340);
+  }
+}, 130);
+
+/* === 滚动：进度条 + 顶栏阴影 === */
+const progressBar = $('#progressBar'), topbar = $('#topbar');
+addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const max = h.scrollHeight - h.clientHeight;
+  progressBar.style.width = (max > 0 ? h.scrollTop / max * 100 : 0) + '%';
+  topbar.classList.toggle('is-scrolled', h.scrollTop > 10);
+}, { passive: true });
+
+/* === 滚动显现（IntersectionObserver，staggered）=== */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){ e.target.classList.add('is-in'); revealObs.unobserve(e.target); }
+  });
+}, { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+$$('.reveal').forEach(el => revealObs.observe(el));
+
+/* === 导航高亮 === */
+const navLinks = $$('.nav-link');
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      navLinks.forEach(l => l.classList.toggle('is-active', l.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { rootMargin: '-38% 0px -55% 0px' });
+$$('main > section[id]').forEach(s => sectionObs.observe(s));
+
+/* === AG 大字：点击爆发彩带 === */
+const agMsgs = [
+  '就是这个手感！', '再来一下试试别的字母', 'IDEA +1',
+  '据说连点三次会有好事发生', 'AG 已收到你的能量'
+];
+let agClicks = 0;
+$$('#agWord span').forEach(el => {
+  const fire = ev => {
+    agClicks++;
+    const r = el.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, 46);
+    if(agClicks % 2 === 0) toast(pick(agMsgs));
+  };
+  el.addEventListener('click', fire);
+  el.addEventListener('keydown', ev => { if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); fire(ev); } });
+});
+
+/* === 板块详情弹层 === */
+const BOARD_INFO = [
+  { kick: 'SECTOR 01 / AIGC', title: 'AIGC 教学',
+    desc: '从提示词到成片的完整链路。每期围绕一个真实交付任务展开：海报、短片、曲目、周边视觉。听完当场开做，离场带走成品。',
+    list: ['AI 绘图与生成视频全流程', '文案 / 设计 / 音乐跨界实验', '零基础友好的实战课表', '现场产出直接上墙（作品墙）'] },
+  { kick: 'SECTOR 02 / APPLY', title: 'AI 应用',
+    desc: '把 AI 塞进你的学习和工作流。不讲玄学，只讲能立刻抄走的组合技：检索、写稿、做表、复盘，一套带走。',
+    list: ['工具链组合与使用技巧', '让 AI 帮你学习、写稿、干活', '效率与创造力双倍放大', '每周「效率武器」分享会'] },
+  { kick: 'SECTOR 03 / BUILD', title: '应用开发',
+    desc: '不会写代码也能上线产品。低代码起步，想深入再走全栈。AG 的开发组负责把你脑子里的原型真正跑起来。',
+    list: ['低代码 / 小程序快速起步', 'Web / App 全栈路线图', '用 AI 打造自己的产品', '每月一次「上线之夜」'] },
+  { kick: 'SECTOR 04 / CREATE', title: '一起创造',
+    desc: '俱乐部最吵的板块：48 小时创意挑战、团队孵化、跨组协作。想法在这里不判生死，只看谁先动手。',
+    list: ['个人 & 团队项目孵化', '48 小时 AI 创意挑战赛', '跨板块协作与互评', '优秀作品直通作品墙'] }
+];
+const modal = $('#modal'), modalBody = $('#modalBody');
+let lastFocus = null;
+function openModal(idx){
+  const b = BOARD_INFO[idx];
+  modalBody.innerHTML =
+    '<span class="m-kicker">' + b.kick + '</span>' +
+    '<h3 id="modalTitle">' + b.title + '</h3>' +
+    '<p>' + b.desc + '</p>' +
+    '<ul class="m-list">' + b.list.map(i => '<li>' + i + '</li>').join('') + '</ul>' +
+    '<a class="btn btn-primary" href="#member" data-close>领一张入场券，来现场做</a>';
+  lastFocus = document.activeElement;
+  modal.classList.add('is-open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  $('.modal-close', modal).focus();
+}
+function closeModal(){
+  modal.classList.remove('is-open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if(lastFocus) lastFocus.focus();
+}
+$$('.board-card').forEach(card => {
+  const idx = +card.dataset.board;
+  card.addEventListener('click', () => openModal(idx));
+  card.addEventListener('keydown', ev => { if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); openModal(idx); } });
+});
+modal.addEventListener('click', ev => { if(ev.target.closest('[data-close]')) closeModal(); });
+addEventListener('keydown', ev => { if(ev.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
+
+/* ============================================================
+   灵感发生器 — 浏览器本地绘制新粗野主义海报
+   ============================================================ */
+const artCanvas = $('#artCanvas'), actx = artCanvas.getContext('2d');
+const ideaInput = $('#ideaInput'), densityInput = $('#density');
+const genOverlay = $('#genOverlay'), typeOut = $('#typeOut'), artBadge = $('#artBadge');
+const STYLE_LABEL = { poster: 'AG · POSTER', illust: 'AG · ILLUST', code: 'AG · CODE', video: 'AG · VIDEO', music: 'AG · MUSIC' };
+let curStyle = 'poster', artSeed = Date.now() % 99999;
+
+const IDEAS = [
+  '用 AI 做一张校园乐队招募海报', '给流浪猫设计一个领养小程序',
+  '把期末复习笔记变成播客', '为宿舍楼画一套像素风门牌',
+  '生成一段 60 秒的城市漫游短片', '用 AI 给老照片上色并配乐',
+  '做一个会吐槽的周报生成器', '给社团招新拍一支赛博预告片'
+];
+
+/* CJK 感知的换行 */
+function wrapText(text, maxPerLine){
+  const lines = []; let cur = '';
+  for(const ch of text){
+    if(ch === '\n'){ lines.push(cur); cur = ''; continue; }
+    cur += ch;
+    const cjk = /[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]/.test(ch);
+    if(cjk && cur.length >= maxPerLine){ lines.push(cur); cur = ''; }
+  }
+  if(cur) lines.push(cur);
+  return lines.slice(0, 4);
+}
+
+/* 四角星（爆炸形） */
+function drawStar(ctx, x, y, r, color){
+  ctx.save(); ctx.translate(x, y); ctx.fillStyle = color; ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for(let i = 0; i < 8; i++){
+    const ang = i * Math.PI / 4, rad = i % 2 === 0 ? r : r * .38;
+    ctx[i === 0 ? 'moveTo' : 'lineTo'](Math.cos(ang) * rad, Math.sin(ang) * rad);
+  }
+  ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+
+function drawPoster(){
+  const W = artCanvas.width, H = artCanvas.height;
+  const rng = mulberry32(artSeed);
+  const density = +densityInput.value;
+  const idea = (ideaInput.value.trim() || '把想法拍在桌上').slice(0, 20);
+  const rrand = (a, b) => a + rng() * (b - a);
+
+  /* 底色 + 纸面 */
+  actx.fillStyle = PAPER; actx.fillRect(0, 0, W, H);
+
+  /* 半调网点（顶部带） */
+  actx.save();
+  for(let y = 40; y < 150; y += 16){
+    for(let x = 40; x < W - 40; x += 16){
+      actx.fillStyle = 'rgba(20,20,20,.13)';
+      actx.beginPath(); actx.arc(x + (y / 16 % 2) * 8, y, 2.4, 0, Math.PI * 2); actx.fill();
+    }
+  }
+  actx.restore();
+
+  /* 外框 */
+  actx.strokeStyle = INK; actx.lineWidth = 5;
+  actx.strokeRect(26, 26, W - 52, H - 52);
+
+  /* 页眉 */
+  actx.fillStyle = INK;
+  actx.font = '700 20px ' + FONT_M;
+  actx.textBaseline = 'middle';
+  actx.fillText('AG × OC CLUB', 52, 196);
+  actx.font = '400 13px ' + FONT_M;
+  actx.fillStyle = '#3A3831';
+  actx.fillText('INSPIRE LAB / NO.' + String(artSeed).padStart(5, '0'), 52, 222);
+
+  const label = STYLE_LABEL[curStyle];
+  actx.font = '700 15px ' + FONT_M;
+  const lw = actx.measureText(label).width + 28;
+  actx.fillStyle = YELLOW; actx.fillRect(W - 52 - lw, 182, lw, 36);
+  actx.strokeRect(W - 52 - lw, 182, lw, 36);
+  actx.fillStyle = INK; actx.textAlign = 'center';
+  actx.fillText(label, W - 52 - lw / 2, 201);
+  actx.textAlign = 'left';
+
+  /* 大标题（分行 + 色块高亮 + 轻旋转） */
+  const lines = wrapText(idea, 7);
+  const hlColors = [YELLOW, INK, BLUE, RED];
+  const hlText  = [INK, PAPER, PAPER, PAPER];
+  let ty = 340;
+  lines.forEach((line, i) => {
+    const fs = line.length > 5 ? 62 : 72;
+    actx.save();
+    actx.translate(64 + (i % 2) * 22, ty);
+    actx.rotate(rrand(-.022, .022));
+    actx.font = '900 ' + fs + 'px ' + FONT_D;
+    const tw = actx.measureText(line).width;
+    actx.fillStyle = hlColors[i % 4];
+    actx.fillRect(-10, -fs / 2 - 14, tw + 20, fs + 28);
+    actx.lineWidth = 4; actx.strokeStyle = INK;
+    actx.strokeRect(-10, -fs / 2 - 14, tw + 20, fs + 28);
+    /* 硬阴影 */
+    actx.fillStyle = 'rgba(20,20,20,.18)';
+    actx.fillRect(6, fs / 2 + 14, tw + 20, 12);
+    actx.fillStyle = hlText[i % 4];
+    actx.textBaseline = 'middle';
+    actx.fillText(line, 0, 2);
+    actx.restore();
+    ty += fs + 58;
+  });
+
+  /* 中部构图：按形式绘制 */
+  actx.save();
+  actx.translate(0, 380);
+  const cy = ty - 340 - 40;
+  if(curStyle === 'poster'){
+    const shapes = ['sq', 'ci', 'tri'];
+    for(let i = 0; i < 3; i++) for(let j = 0; j < 4; j++){
+      const x = 80 + j * 128, y = cy + i * 74, s = shapes[(i + j) % 3];
+      actx.lineWidth = 4; actx.strokeStyle = INK;
+      if(s === 'sq'){ actx.fillStyle = (i + j) % 2 ? BLUE : YELLOW; actx.fillRect(x, y, 52, 52); actx.strokeRect(x, y, 52, 52); }
+      else if(s === 'ci'){ actx.fillStyle = (i + j) % 2 ? RED : PAPER; actx.beginPath(); actx.arc(x + 26, y + 26, 27, 0, Math.PI * 2); actx.fill(); actx.stroke(); }
+      else{ actx.fillStyle = INK; actx.beginPath(); actx.moveTo(x, y + 52); actx.lineTo(x + 26, y); actx.lineTo(x + 52, y + 52); actx.closePath(); actx.fill(); }
+    }
+  }else if(curStyle === 'illust'){
+    const cx2 = W / 2, cyy = cy + 60;
+    actx.lineWidth = 5; actx.strokeStyle = INK;
+    actx.fillStyle = YELLOW; actx.beginPath(); actx.arc(cx2, cyy, 92, 0, Math.PI * 2); actx.fill(); actx.stroke();
+    actx.strokeStyle = BLUE; actx.lineWidth = 6;
+    actx.beginPath(); actx.arc(cx2 - 130, cyy, 60, .5, 3.6); actx.stroke();
+    actx.beginPath(); actx.arc(cx2 + 130, cyy + 20, 44, 2.4, 5.6); actx.stroke();
+    actx.fillStyle = INK;
+    actx.beginPath(); actx.arc(cx2 - 26, cyy - 16, 11, 0, Math.PI * 2); actx.fill();
+    actx.beginPath(); actx.arc(cx2 + 26, cyy - 16, 11, 0, Math.PI * 2); actx.fill();
+    actx.lineWidth = 5; actx.strokeStyle = INK;
+    actx.beginPath(); actx.arc(cx2, cyy + 18, 34, .25, Math.PI - .25); actx.stroke();
+    drawStar(actx, cx2 + 150, cyy - 70, 26, RED);
+  }else if(curStyle === 'code'){
+    const bx = 70, by = cy, bw = W - 140, bh = 190;
+    actx.fillStyle = INK; actx.fillRect(bx, by, bw, bh);
+    actx.fillStyle = YELLOW; actx.fillRect(bx, by, bw, 34);
+    actx.lineWidth = 4; actx.strokeStyle = INK; actx.strokeRect(bx, by, bw, bh);
+    actx.fillStyle = INK;
+    [RED, YELLOW, CYAN].forEach((c, i) => { actx.fillStyle = c; actx.fillRect(bx + 14 + i * 24, by + 11, 13, 13); });
+    actx.font = '400 15px ' + FONT_M; actx.fillStyle = PAPER;
+    const codeLines = ['$ ag run "' + idea.slice(0, 6) + '"', '  ▸ parsing idea ......... ok', '  ▸ remixing layout ...... ok', '  ▸ SHIPPED in 1.2s ✦'];
+    codeLines.forEach((l, i) => actx.fillText(l, bx + 18, by + 62 + i * 30));
+  }else if(curStyle === 'video'){
+    const cx2 = W / 2, cyy = cy + 70;
+    actx.lineWidth = 6; actx.strokeStyle = INK; actx.fillStyle = BLUE;
+    actx.beginPath(); actx.arc(cx2, cyy, 84, 0, Math.PI * 2); actx.fill(); actx.stroke();
+    actx.fillStyle = YELLOW; actx.strokeStyle = INK; actx.lineWidth = 5;
+    actx.beginPath(); actx.moveTo(cx2 - 24, cyy - 40); actx.lineTo(cx2 + 44, cyy); actx.lineTo(cx2 - 24, cyy + 40);
+    actx.closePath(); actx.fill(); actx.stroke();
+    actx.fillStyle = INK; actx.fillRect(90, cyy + 120, W - 180, 16); actx.strokeRect(90, cyy + 120, W - 180, 16);
+    actx.fillStyle = RED; actx.fillRect(90, cyy + 120, (W - 180) * .62, 16);
+    actx.fillStyle = INK; actx.beginPath(); actx.arc(90 + (W - 180) * .62, cyy + 128, 17, 0, Math.PI * 2); actx.fill();
+    actx.fillStyle = YELLOW; actx.beginPath(); actx.arc(90 + (W - 180) * .62, cyy + 128, 8, 0, Math.PI * 2); actx.fill();
+  }else{ /* music */
+    const bars = 14, bx0 = 86, by0 = cy + 150;
+    for(let i = 0; i < bars; i++){
+      const h2 = 30 + Math.abs(Math.sin(artSeed * .7 + i * 1.7)) * 120;
+      actx.fillStyle = i % 3 === 0 ? RED : (i % 3 === 1 ? YELLOW : BLUE);
+      actx.fillRect(bx0 + i * 34, by0 - h2, 24, h2);
+      actx.lineWidth = 3.5; actx.strokeStyle = INK; actx.strokeRect(bx0 + i * 34, by0 - h2, 24, h2);
+    }
+    actx.font = '700 16px ' + FONT_M; actx.fillStyle = INK;
+    actx.fillText('♪ NOW PLAYING: ' + idea.slice(0, 8) + '…', 86, by0 + 34);
+  }
+  actx.restore();
+
+  /* 密度装饰：散落图形 + 爆炸星 */
+  const decoN = Math.round(density / 100 * 26);
+  for(let i = 0; i < decoN; i++){
+    const x = rrand(60, W - 60), y = rrand(300, H - 260);
+    const kind = Math.floor(rng() * 3);
+    actx.lineWidth = 2.5; actx.strokeStyle = INK;
+    if(kind === 0){ actx.fillStyle = pickSeed(rng, [YELLOW, BLUE, RED, CYAN]); const s = rrand(9, 20); actx.fillRect(x, y, s, s); actx.strokeRect(x, y, s, s); }
+    else if(kind === 1){ actx.fillStyle = 'rgba(20,20,20,.16)'; actx.beginPath(); actx.arc(x, y, rrand(3, 7), 0, Math.PI * 2); actx.fill(); }
+    else drawStar(actx, x, y, rrand(10, 22), pickSeed(rng, [YELLOW, RED, BLUE, PAPER]));
+  }
+
+  /* 底部：条形码 + 页脚 */
+  const fy = H - 108;
+  actx.fillStyle = INK;
+  let bxx = 52;
+  while(bxx < W - 300){
+    const bw2 = rrand(3, 11);
+    actx.fillRect(bxx, fy, bw2, 46); bxx += bw2 + rrand(4, 10);
+  }
+  actx.font = '400 13px ' + FONT_M; actx.fillStyle = '#3A3831';
+  actx.fillText('MEMBER-MADE / LOCAL RENDER / NO CLOUD', 52, fy + 72);
+  actx.font = '900 26px ' + FONT_D; actx.fillStyle = INK; actx.textAlign = 'right';
+  actx.fillText('AG.', W - 52, fy + 40);
+  actx.textAlign = 'left';
+}
+function pickSeed(rng, arr){ return arr[Math.floor(rng() * arr.length)]; }
+
+/* 打字机输出 */
+let typeTimer = null;
+function typeWriter(text){
+  clearInterval(typeTimer);
+  typeOut.textContent = '';
+  let i = 0;
+  typeTimer = setInterval(() => {
+    typeOut.textContent = text.slice(0, ++i);
+    if(i >= text.length) clearInterval(typeTimer);
+  }, 34);
+}
+
+/* 形式切换 */
+$$('#styleChips .chip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('#styleChips .chip-btn').forEach(b => b.classList.remove('is-on'));
+    btn.classList.add('is-on');
+    curStyle = btn.dataset.style;
+    artBadge.textContent = STYLE_LABEL[curStyle];
+    generateArt(false);
+  });
+});
+
+/* 生成流程（带加载态） */
+let genBusy = false;
+function generateArt(withFx){
+  if(genBusy) return;
+  genBusy = true;
+  if(withFx){ artSeed = Math.floor(Math.random() * 99999); }
+  genOverlay.classList.add('is-on');
+  genOverlay.setAttribute('aria-hidden', 'false');
+  setTimeout(() => {
+    drawPoster();
+    genOverlay.classList.remove('is-on');
+    genOverlay.setAttribute('aria-hidden', 'true');
+    genBusy = false;
+    typeWriter('DONE ✓ ' + (ideaInput.value.trim() || '把想法拍在桌上') + ' → ' + $('#styleChips .chip-btn.is-on').textContent + '样本');
+    toast('灵感样本已生成 · 全部在本地绘制');
+    const r = $('#generateBtn').getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top, 26);
+  }, withFx ? 700 : 240);
+}
+
+$('#generateBtn').addEventListener('click', () => generateArt(true));
+$('#regenBtn').addEventListener('click', () => generateArt(true));
+$('#diceBtn').addEventListener('click', () => {
+  ideaInput.value = pick(IDEAS.filter(i => i !== ideaInput.value));
+  generateArt(true);
+});
+$('#downloadBtn').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.download = 'AG-inspire-' + artSeed + '.png';
+  a.href = artCanvas.toDataURL('image/png');
+  a.click();
+  toast('海报已保存到你的下载文件夹');
+});
+
+/* ============================================================
+   贴纸工作台 — 拖拽 / 双击旋转 / 惯性
+   ============================================================ */
+const deskPanel = $('#deskPanel'), deskItems = $('#deskItems');
+const STICKERS = [
+  { t: 'IDEA → 作品', c: 's-y', r: -4, w: 150 },
+  { t: 'AG · 01', c: 's-k', r: 3, w: 96 },
+  { t: 'SHIP IT!', c: 's-b', r: -2, w: 118 },
+  { t: '灵感浓度 68%', c: 's-m', r: 1.5, w: 148 },
+  { t: '动手第一', c: 's-r', r: -3, w: 122 },
+  { t: 'AI × ME', c: '', r: 2, w: 104 },
+  { t: 'OC CLUB', c: 's-m', r: -1, w: 108 },
+  { t: '别想太多', c: 's-y', r: 4, w: 118 },
+  { t: 'BUG FREE?', c: 's-b', r: -2.5, w: 120 },
+  { t: '上新啦', c: 's-k', r: 1, w: 92 }
+];
+let stickerEls = [];
+
+function layoutStickers(){
+  const pw = deskPanel.clientWidth, ph = deskPanel.clientHeight;
+  const cols = 5, rows = 2;
+  const gw = (pw - 60) / cols, gh = (ph - 160) / rows;
+  STICKERS.forEach((s, i) => {
+    const el = stickerEls[i]; if(!el) return;
+    const col = i % cols, row = Math.floor(i / cols);
+    const x = 30 + col * gw + rand(-14, 14) + (gw - s.w) / 2;
+    const y = 90 + row * gh + rand(-16, 16);
+    el.dataset.x = clamp(x, 4, pw - s.w - 4);
+    el.dataset.y = clamp(y, 60, ph - 130);
+    el.dataset.rot = s.r + rand(-2, 2);
+    applySticker(el);
+  });
+}
+function applySticker(el){
+  el.style.left = el.dataset.x + 'px';
+  el.style.top = el.dataset.y + 'px';
+  el.style.transform = 'rotate(' + el.dataset.rot + 'deg)';
+}
+function buildStickers(){
+  deskItems.innerHTML = '';
+  stickerEls = [];
+  STICKERS.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'sticker ' + s.c;
+    el.textContent = s.t;
+    el.style.width = s.w + 'px';
+    el.tabIndex = 0;
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', '贴纸：' + s.t + '，可拖动，双击旋转');
+    deskItems.appendChild(el);
+    stickerEls.push(el);
+  });
+  layoutStickers();
+}
+
+/* 拖拽逻辑（Pointer Events，带惯性动画） */
+let drag = null;
+deskPanel.addEventListener('pointerdown', ev => {
+  const el = ev.target.closest('.sticker'); if(!el) return;
+  ev.preventDefault();
+  drag = {
+    el, id: ev.pointerId, startX: ev.clientX, startY: ev.clientY,
+    origX: +el.dataset.x, origY: +el.dataset.y,
+    lastX: ev.clientX, lastY: ev.clientY, lastT: performance.now(),
+    vx: 0, vy: 0, moved: false
+  };
+  el.classList.add('is-drag');
+  deskPanel.setPointerCapture(ev.pointerId);
+});
+deskPanel.addEventListener('pointermove', ev => {
+  if(!drag || ev.pointerId !== drag.id) return;
+  const now = performance.now(), dt = Math.max(1, now - drag.lastT);
+  drag.vx = (ev.clientX - drag.lastX) / dt * 16;
+  drag.vy = (ev.clientY - drag.lastY) / dt * 16;
+  drag.lastX = ev.clientX; drag.lastY = ev.clientY; drag.lastT = now;
+  const pw = deskPanel.clientWidth, ph = deskPanel.clientHeight;
+  const w = drag.el.offsetWidth, h = drag.el.offsetHeight;
+  drag.el.dataset.x = clamp(drag.origX + ev.clientX - drag.startX, 4, pw - w - 4);
+  drag.el.dataset.y = clamp(drag.origY + ev.clientY - drag.startY, 56, ph - h - 60);
+  drag.moved = true;
+  applySticker(drag.el);
+});
+function endDrag(ev){
+  if(!drag || ev.pointerId !== drag.id) return;
+  const el = drag.el;
+  el.classList.remove('is-drag');
+  /* 惯性 */
+  let vx = clamp(drag.vx, -18, 18), vy = clamp(drag.vy, -18, 18);
+  const pw = deskPanel.clientWidth, ph = deskPanel.clientHeight;
+  const w = el.offsetWidth, h = el.offsetHeight;
+  function glide(){
+    if(Math.abs(vx) < .4 && Math.abs(vy) < .4) return;
+    let nx = +el.dataset.x + vx, ny = +el.dataset.y + vy;
+    if(nx < 4 || nx > pw - w - 4){ vx *= -.55; nx = clamp(nx, 4, pw - w - 4); }
+    if(ny < 56 || ny > ph - h - 60){ vy *= -.55; ny = clamp(ny, 56, ph - h - 60); }
+    el.dataset.x = nx; el.dataset.y = ny;
+    applySticker(el);
+    vx *= .92; vy *= .92;
+    requestAnimationFrame(glide);
+  }
+  requestAnimationFrame(glide);
+  /* 提示隐藏 */
+  $('#deskHint').style.opacity = '0';
+  $('#deskHint').style.transition = 'opacity .4s';
+  drag = null;
+}
+deskPanel.addEventListener('pointerup', endDrag);
+deskPanel.addEventListener('pointercancel', endDrag);
+
+/* 双击 / 双触旋转 15° */
+deskPanel.addEventListener('dblclick', ev => {
+  const el = ev.target.closest('.sticker'); if(!el) return;
+  el.dataset.rot = +el.dataset.rot + 15;
+  applySticker(el);
+});
+
+/* 键盘可访问：方向键移动 */
+deskPanel.addEventListener('keydown', ev => {
+  const el = ev.target.closest('.sticker'); if(!el) return;
+  const step = ev.shiftKey ? 24 : 8;
+  const map = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+  if(map[ev.key]){
+    ev.preventDefault();
+    el.dataset.x = +el.dataset.x + map[ev.key][0];
+    el.dataset.y = +el.dataset.y + map[ev.key][1];
+    applySticker(el);
+  }
+  if(ev.key === 'Enter'){ ev.preventDefault(); el.dataset.rot = +el.dataset.rot + 15; applySticker(el); }
+});
+
+$('#shuffleBtn').addEventListener('click', () => {
+  const pw = deskPanel.clientWidth, ph = deskPanel.clientHeight;
+  stickerEls.forEach(el => {
+    el.dataset.x = rand(10, Math.max(20, pw - el.offsetWidth - 10));
+    el.dataset.y = rand(60, Math.max(80, ph - el.offsetHeight - 70));
+    el.dataset.rot = rand(-14, 14);
+    applySticker(el);
+  });
+  toast('工作台已重新洗牌');
+});
+$('#resetDeskBtn').addEventListener('click', () => { layoutStickers(); toast('已复原初始布局'); });
+
+let deskResizeTimer = null;
+addEventListener('resize', () => {
+  clearTimeout(deskResizeTimer);
+  deskResizeTimer = setTimeout(layoutStickers, 220);
+}, { passive: true });
+
+/* ============================================================
+   会员卡 — 本地绘制 + 翻面 + 下载
+   ============================================================ */
+const mCan = $('#memberCanvas'), mctx = mCan.getContext('2d');
+const mBack = $('#memberCanvasBack'), mbctx = mBack.getContext('2d');
+const nameInput = $('#nameInput'), serialOut = $('#serialOut');
+const cardFlipper = $('#cardFlipper');
+let curRole = '学习者', memberSerial = '';
+
+function genSerial(){
+  const n = Math.floor(Math.random() * 9000 + 1000);
+  const m = Math.floor(Math.random() * 9000 + 1000);
+  memberSerial = 'AG-' + n + '-' + m;
+  serialOut.textContent = memberSerial;
+}
+
+function drawCardFront(){
+  const W = mCan.width, H = mCan.height;
+  const name = (nameInput.value.trim() || '新朋友').slice(0, 10);
+  mctx.fillStyle = PAPER; mctx.fillRect(0, 0, W, H);
+
+  /* 半调网点 */
+  for(let y = 20; y < H; y += 14){
+    for(let x = 20; x < W; x += 14){
+      if((x / 14 + y / 14) % 3) continue;
+      mctx.fillStyle = 'rgba(20,20,20,.09)';
+      mctx.beginPath(); mctx.arc(x, y, 2.2, 0, Math.PI * 2); mctx.fill();
+    }
+  }
+
+  /* 边框 */
+  mctx.strokeStyle = INK; mctx.lineWidth = 6;
+  mctx.strokeRect(18, 18, W - 36, H - 36);
+
+  /* 顶部色带 */
+  mctx.fillStyle = YELLOW; mctx.fillRect(18, 18, W - 36, 74);
+  mctx.lineWidth = 4; mctx.strokeRect(18, 18, W - 36, 74);
+  mctx.fillStyle = INK; mctx.font = '900 34px ' + FONT_D;
+  mctx.textBaseline = 'middle'; mctx.textAlign = 'left';
+  mctx.fillText('AG × OC 俱乐部', 44, 57);
+  mctx.font = '700 15px ' + FONT_M;
+  mctx.fillText('MEMBER CARD', 44, 78 + 18);
+
+  /* 右上：AG 方块标 */
+  mctx.fillStyle = INK; mctx.fillRect(W - 150, 34, 92, 52);
+  mctx.fillStyle = YELLOW; mctx.font = '900 30px ' + FONT_D;
+  mctx.textAlign = 'center'; mctx.fillText('AG', W - 104, 62);
+  mctx.textAlign = 'left';
+
+  /* 名字区 */
+  mctx.font = '700 14px ' + FONT_M; mctx.fillStyle = '#3A3831';
+  mctx.fillText('NAME / 持卡人', 44, 148);
+  const nw = Math.max(200, mctx.measureText(name).width * 1.6 + 40);
+  mctx.save();
+  mctx.translate(44, 218);
+  mctx.rotate(-.014);
+  mctx.fillStyle = BLUE;
+  mctx.fillRect(0, -52, nw, 104);
+  mctx.lineWidth = 5; mctx.strokeStyle = INK;
+  mctx.strokeRect(0, -52, nw, 104);
+  mctx.fillStyle = 'rgba(20,20,20,.22)';
+  mctx.fillRect(8, 52, nw, 14);
+  mctx.fillStyle = PAPER;
+  mctx.font = '900 ' + (name.length > 6 ? 52 : 68) + 'px ' + FONT_D;
+  mctx.textAlign = 'center'; mctx.textBaseline = 'middle';
+  mctx.fillText(name, nw / 2, 2);
+  mctx.restore();
+
+  /* 身份 + 卡号 */
+  mctx.font = '700 14px ' + FONT_M; mctx.fillStyle = '#3A3831';
+  mctx.fillText('ROLE / 身份', 44, 300);
+  mctx.font = '900 30px ' + FONT_D; mctx.fillStyle = INK;
+  mctx.fillText(curRole, 44, 340);
+
+  mctx.font = '700 14px ' + FONT_M; mctx.fillStyle = '#3A3831';
+  mctx.fillText('NO. / 卡号', 44, 386);
+  mctx.font = '700 24px ' + FONT_M; mctx.fillStyle = BLUE;
+  mctx.fillText(memberSerial, 44, 418);
+
+  /* 右下角爆炸星 */
+  drawStar(mctx, W - 120, 356, 40, YELLOW);
+  drawStar(mctx, W - 190, 320, 16, RED);
+  drawStar(mctx, W - 90, 396, 13, BLUE);
+
+  /* 底部口号 */
+  mctx.font = '700 15px ' + FONT_M; mctx.fillStyle = INK;
+  mctx.textAlign = 'right';
+  mctx.fillText('用 AI，创造更多可能', W - 44, 428);
+  mctx.textAlign = 'left';
+}
+
+function drawCardBack(){
+  const W = mBack.width, H = mBack.height;
+  mbctx.fillStyle = INK; mbctx.fillRect(0, 0, W, H);
+  /* 网格 */
+  mbctx.strokeStyle = 'rgba(251,249,242,.08)'; mbctx.lineWidth = 1.5;
+  for(let x = 20; x < W; x += 40){ mbctx.beginPath(); mbctx.moveTo(x, 20); mbctx.lineTo(x, H - 20); mbctx.stroke(); }
+  for(let y = 20; y < H; y += 40){ mbctx.beginPath(); mbctx.moveTo(20, y); mbctx.lineTo(W - 20, y); mbctx.stroke(); }
+  /* 边框 */
+  mbctx.strokeStyle = YELLOW; mbctx.lineWidth = 5;
+  mbctx.strokeRect(18, 18, W - 36, H - 36);
+
+  mbctx.textBaseline = 'middle'; mbctx.textAlign = 'left';
+  mbctx.fillStyle = YELLOW; mbctx.font = '900 30px ' + FONT_D;
+  mbctx.fillText('俱乐部公约 / RULES', 48, 78);
+
+  mbctx.font = '700 17px ' + FONT_M;
+  const rules = [
+    '01 · 先动手，再完善',
+    '02 · 分享工具，也分享踩过的坑',
+    '03 · 作品不完美也可以上墙',
+    '04 · 尊重每一个阶段的想法'
+  ];
+  rules.forEach((r, i) => {
+    mbctx.fillStyle = i % 2 ? '#b9b5a7' : PAPER;
+    mbctx.fillText(r, 48, 140 + i * 44);
+  });
+
+  /* 条形码 */
+  let bxx = 48; const by = H - 118;
+  while(bxx < W - 200){
+    const bw2 = rand(3, 9);
+    mbctx.fillStyle = PAPER; mbctx.fillRect(bxx, by, bw2, 52);
+    bxx += bw2 + rand(3, 8);
+  }
+  mbctx.fillStyle = '#8f8b7d'; mbctx.font = '400 12px ' + FONT_M;
+  mbctx.fillText('AG.CLUB / OC / EST.2024', 48, by + 76);
+  mbctx.textAlign = 'right'; mbctx.fillStyle = YELLOW;
+  mbctx.font = '900 26px ' + FONT_D;
+  mbctx.fillText('AG.', W - 44, H - 62);
+  mbctx.textAlign = 'left';
+}
+
+function refreshCard(){ drawCardFront(); drawCardBack(); }
+
+/* 身份切换 + 名字实时刷新 */
+$$('#roleChips .chip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('#roleChips .chip-btn').forEach(b => b.classList.remove('is-on'));
+    btn.classList.add('is-on');
+    curRole = btn.dataset.role;
+    refreshCard();
+  });
+});
+nameInput.addEventListener('input', refreshCard);
+
+const NICKS = ['陆知远', '苏珂', '邱野', '白一苇', '温叙', '祝清野', '路之遥', '柯一芒', '林晚舟', '迟一诺'];
+$('#randomNameBtn').addEventListener('click', () => {
+  nameInput.value = pick(NICKS.filter(n => n !== nameInput.value));
+  genSerial(); refreshCard();
+});
+
+$('#flipCardBtn').addEventListener('click', () => {
+  cardFlipper.classList.toggle('is-flipped');
+  toast(cardFlipper.classList.contains('is-flipped') ? '背面：俱乐部公约' : '正面：你的名字');
+});
+
+$('#downloadCardBtn').addEventListener('click', () => {
+  const isBack = cardFlipper.classList.contains('is-flipped');
+  const src = isBack ? mBack : mCan;
+  const a = document.createElement('a');
+  a.download = 'AG-member-card-' + (nameInput.value.trim() || 'member') + (isBack ? '-back' : '') + '.png';
+  a.href = src.toDataURL('image/png');
+  a.click();
+  burst(innerWidth / 2, innerHeight / 2, 60);
+  toast('会员卡已带走 · 欢迎加入 AG');
+});
+
+/* JOIN 按钮：小彩蛋 */
+$('#joinBtn').addEventListener('click', ev => {
+  setTimeout(() => burst(ev.clientX || innerWidth / 2, ev.clientY || innerHeight / 2, 50), 220);
+});
+
+/* === 初始化 === */
+buildStickers();
+genSerial();
+drawCardFront();
+drawCardBack();
+setTimeout(() => drawPoster(), 400); /* 等字体尽量就绪 */
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(() => { drawPoster(); drawCardFront(); drawCardBack(); });
+}
+
+/* ============================================================
+   灵感创作区 A — 磁吸字母墙 + 粒子喷发（canvas）
+   ============================================================ */
+const mgWrap = $('#magnetWrap'), mgField = $('#magnetField'), mgCanvas = $('#magnetCanvas');
+const mgx = mgCanvas.getContext('2d');
+const MG_ITEMS = [
+  { t: 'IDEA', c: 'mg-y' }, { t: 'SHIP', c: 'mg-b' }, { t: 'AG', c: 'mg-k' },
+  { t: '动手', c: 'mg-r' }, { t: 'CODE', c: 'mg-m' }, { t: '灵感', c: 'mg-y' },
+  { t: 'AI', c: 'mg-b' }, { t: 'MAKE', c: 'mg-m' }, { t: '玩', c: 'mg-k' },
+  { t: 'FUN', c: 'mg-r' }, { t: 'OC', c: 'mg-y' }, { t: 'BETA', c: 'mg-m' }
+];
+let mgNodes = [], mgParticles = [], mgPointer = { x: -9999, y: -9999 };
+let mgRAF = null, mgW = 0, mgH = 0;
+
+function mgResize(){
+  const r = mgWrap.getBoundingClientRect();
+  mgW = mgCanvas.width = Math.round(r.width * devicePixelRatio);
+  mgH = mgCanvas.height = Math.round(r.height * devicePixelRatio);
+  mgCanvas.style.width = r.width + 'px';
+  mgCanvas.style.height = r.height + 'px';
+  mgx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+function mgInit(){
+  mgField.innerHTML = '';
+  mgNodes = [];
+  MG_ITEMS.forEach((it, i) => {
+    const el = document.createElement('div');
+    el.className = 'mg-item ' + it.c;
+    el.textContent = it.t;
+    el.setAttribute('aria-hidden', 'true');
+    mgField.appendChild(el);
+    mgNodes.push({ el, hx: 0, hy: 0, x: 0, y: 0, vx: 0, vy: 0, rot: rand(-3, 3) });
+  });
+  mgResize();
+  /* 记录静止位（布局后的中心点） */
+  requestAnimationFrame(() => {
+    const wr = mgWrap.getBoundingClientRect();
+    mgNodes.forEach(n => {
+      const r = n.el.getBoundingClientRect();
+      n.hx = r.left - wr.left + r.width / 2;
+      n.hy = r.top - wr.top + r.height / 2;
+    });
+    if(!mgRAF) mgRAF = requestAnimationFrame(mgTick);
+  });
+}
+
+/* 粒子：小方块 + 圆点（粗野配色） */
+function mgSpark(x, y, count){
+  const colors = [YELLOW, BLUE, RED, CYAN, INK];
+  for(let i = 0; i < count; i++){
+    const ang = rand(0, Math.PI * 2), spd = rand(2, 8);
+    mgParticles.push({
+      x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 1.5,
+      s: rand(4, 10), life: 1, decay: rand(.015, .03),
+      color: colors[i % colors.length], round: Math.random() < .3
+    });
+  }
+}
+
+/* 物理循环：弹簧回位 + 指针斥力 + 粒子绘制 */
+function mgTick(){
+  const K = .082, DAMP = .86, RANGE = 130, FORCE = 5.2;
+  mgx.clearRect(0, 0, mgCanvas.width, mgCanvas.height);
+  let anyMove = false;
+  for(const n of mgNodes){
+    /* 指针斥力 */
+    const dx = n.hx + n.x - mgPointer.x, dy = n.hy + n.y - mgPointer.y;
+    const d2 = dx * dx + dy * dy;
+    if(d2 < RANGE * RANGE && d2 > .01){
+      const d = Math.sqrt(d2), f = (1 - d / RANGE) * FORCE;
+      n.vx += dx / d * f; n.vy += dy / d * f;
+      if(Math.random() < .3) mgSpark(mgPointer.x + dx * .3, mgPointer.y + dy * .3, 2);
+    }
+    /* 弹簧回位 */
+    n.vx += (0 - n.x) * K;
+    n.vy += (0 - n.y) * K;
+    n.vx *= DAMP; n.vy *= DAMP;
+    n.x += n.vx; n.y += n.vy;
+    if(Math.abs(n.x) > .1 || Math.abs(n.y) > .1) anyMove = true;
+    /* 位移带动轻微摆动 */
+    n.rot += (Math.abs(n.vx) + Math.abs(n.vy)) * .02;
+    n.el.style.transform = 'translate(' + n.x.toFixed(1) + 'px,' + n.y.toFixed(1) + 'px) rotate(' + Math.sin(n.rot) * 2.4 + 'deg)';
+  }
+  /* 粒子 */
+  mgParticles = mgParticles.filter(p => p.life > 0);
+  for(const p of mgParticles){
+    p.vy += .22; p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+    mgx.globalAlpha = clamp(p.life, 0, 1);
+    mgx.fillStyle = p.color; mgx.strokeStyle = INK; mgx.lineWidth = 1.5;
+    if(p.round){ mgx.beginPath(); mgx.arc(p.x, p.y, p.s / 2, 0, Math.PI * 2); mgx.fill(); mgx.stroke(); }
+    else{ mgx.fillRect(p.x, p.y, p.s, p.s); mgx.strokeRect(p.x, p.y, p.s, p.s); }
+  }
+  mgx.globalAlpha = 1;
+  if(anyMove || mgParticles.length) mgRAF = requestAnimationFrame(mgTick);
+  else mgRAF = null;
+}
+
+/* 指针事件（鼠标 + 触摸统一） */
+mgWrap.addEventListener('pointermove', ev => {
+  const r = mgWrap.getBoundingClientRect();
+  mgPointer.x = ev.clientX - r.left;
+  mgPointer.y = ev.clientY - r.top;
+  $('#magnetHint').style.opacity = '0';
+  if(!mgRAF) mgRAF = requestAnimationFrame(mgTick);
+}, { passive: true });
+mgWrap.addEventListener('pointerleave', () => { mgPointer.x = -9999; mgPointer.y = -9999; });
+mgWrap.addEventListener('pointerdown', ev => {
+  const r = mgWrap.getBoundingClientRect();
+  mgSpark(ev.clientX - r.left, ev.clientY - r.top, 22);
+  if(!mgRAF) mgRAF = requestAnimationFrame(mgTick);
+});
+
+/* 控制按钮 */
+$('#mgBoostBtn').addEventListener('click', () => {
+  mgNodes.forEach(n => { n.vx += rand(-14, 14); n.vy += rand(-16, -4); });
+  mgSpark(rand(60, mgW / devicePixelRatio - 60), rand(40, mgH / devicePixelRatio - 40), 30);
+  if(!mgRAF) mgRAF = requestAnimationFrame(mgTick);
+  toast('灵感喷发 +12');
+});
+$('#mgResetBtn').addEventListener('click', () => {
+  mgNodes.forEach(n => { n.x = n.y = n.vx = n.vy = 0; });
+  if(!mgRAF) mgRAF = requestAnimationFrame(mgTick);
+  toast('字母已归位');
+});
+
+let mgResizeTimer = null;
+addEventListener('resize', () => {
+  clearTimeout(mgResizeTimer);
+  mgResizeTimer = setTimeout(() => { mgResize(); mgInit(); }, 240);
+}, { passive: true });
+
+/* ============================================================
+   灵感创作区 B — 3D 电脑（注入结构 + 拖拽旋转 + 缩放 + 放大）
+   ============================================================ */
+const RIG_HTML = `
+<div class="env" aria-hidden="true">
+  <div class="env-box"><i class="eb-f bf1"></i><i class="eb-f bf2"></i><i class="eb-f bf3"></i><i class="eb-f bf4"></i><i class="eb-f bf5"></i><i class="eb-f bf6"></i></div>
+  <div class="env-floor"></div>
+  <div class="env-ringwrap r1"><i class="env-ring"></i></div>
+  <div class="env-ringwrap r2"><i class="env-ring"></i></div>
+  <div class="env-mini m1"><i class="em-spin"><i class="em-f f1"></i><i class="em-f f2"></i><i class="em-f f3"></i><i class="em-f f4"></i><i class="em-f f5"></i><i class="em-f f6"></i></i></div>
+  <div class="env-mini m2"><i class="em-spin"><i class="em-f f1"></i><i class="em-f f2"></i><i class="em-f f3"></i><i class="em-f f4"></i><i class="em-f f5"></i><i class="em-f f6"></i></i></div>
+  <span class="env-dot d1"><i></i></span>
+  <span class="env-dot d2"><i></i></span>
+  <span class="env-dot d3"><i></i></span>
+  <span class="env-dot d4"><i></i></span>
+  <span class="env-label l1">SPACE / GRID-07</span>
+  <span class="env-label l2">UNIT-01 · EST.24</span>
+</div>
+<div class="shard" data-ex="0,-64,52,4">
+  <div class="rig-screen">
+    <div class="shard" data-ex="0,0,84,0">
+      <div class="rs-front">
+        <div class="rs-bezel">
+          <div class="rs-glow" aria-hidden="true"></div>
+          <div class="rs-pix" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="rs-code" aria-hidden="true"><ul>
+            <li>$ ag init "新点子"</li>
+            <li>&gt; 拆解任务 .......... OK</li>
+            <li>&gt; 生成草稿 .......... OK</li>
+            <li class="err">! 检测到过度纠结</li>
+            <li>&gt; 强制动手 .......... OK</li>
+            <li>$ ag ship --now</li>
+            <li>&gt; 作品 +1 上墙</li>
+            <li>&gt; 成员鼓掌</li>
+            <li>$ ag init "新点子"</li>
+            <li>&gt; 拆解任务 .......... OK</li>
+            <li>&gt; 生成草稿 .......... OK</li>
+            <li class="err">! 检测到过度纠结</li>
+            <li>&gt; 强制动手 .......... OK</li>
+            <li>$ ag ship --now</li>
+            <li>&gt; 作品 +1 上墙</li>
+            <li>&gt; 成员鼓掌</li>
+          </ul></div>
+          <span class="rs-cursor" aria-hidden="true"></span>
+          <div class="rs-scan" aria-hidden="true"></div>
+          <span class="rs-tag">REC</span>
+        </div>
+        <div class="rf-chin" aria-hidden="true">
+          <span class="rf-brand">AG-UNIT-01</span>
+          <span class="rf-grille"></span>
+          <span class="rf-led"></span>
+        </div>
+      </div>
+    </div>
+    <div class="shard" data-ex="0,0,-84,0">
+      <div class="rs-back">
+        <span class="rb-sticker">此机被 247 人<br>摸过</span>
+        <span class="rb-label">AG-UNIT-01 / CSS-3D</span>
+        <div class="rb-vents" aria-hidden="true"></div>
+        <div class="rb-ports" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+    </div>
+    <div class="shard" data-ex="0,-62,6,-6"><div class="rs-edge top" aria-hidden="true"></div></div>
+    <div class="shard" data-ex="0,62,6,5"><div class="rs-edge bottom" aria-hidden="true"></div></div>
+    <div class="shard" data-ex="-86,0,4,-4"><div class="rs-edge left" aria-hidden="true"></div></div>
+    <div class="shard" data-ex="86,0,4,4"><div class="rs-edge right" aria-hidden="true"></div></div>
+  </div>
+</div>
+<div class="shard" data-ex="0,44,-26,-8"><div class="rig-stand" aria-hidden="true"></div></div>
+<div class="shard" data-ex="0,54,-64,6"><div class="rig-stand-back" aria-hidden="true"></div></div>
+<div class="shard" data-ex="0,78,26,-5"><div class="rig-base" aria-hidden="true"><div class="rb-top"></div><div class="rb-front"></div></div></div>
+<div class="shard" data-ex="66,58,88,10">
+  <div class="rig-kb" aria-hidden="true">
+    <div class="rk-keys">
+      <i></i><i></i><i class="k-y"></i><i></i><i></i><i></i><i class="k-b"></i><i></i><i></i>
+      <i></i><i class="k-r"></i><i></i><i></i><i class="k-y"></i><i></i><i></i><i></i><i class="k-b"></i>
+      <i></i><i></i><i></i><i class="k-r"></i><i class="rk-space"></i><i class="k-y"></i><i></i><i></i><i></i>
+    </div>
+  </div>
+</div>
+<div class="shard" data-ex="112,44,108,-12"><div class="rig-mouse" aria-hidden="true"></div></div>
+<div class="shard" data-ex="-118,36,96,9"><div class="rig-cup" aria-hidden="true"></div></div>
+<div class="shard" data-ex="-148,58,54,-10"><div class="rig-floppy" aria-hidden="true"></div></div>
+<div class="shard" data-ex="96,70,-40,12"><div class="rig-cable" aria-hidden="true"></div></div>
+<div class="shard" data-ex="150,-58,30,-14"><div class="rig-note n1" aria-hidden="true"><i>TODO:<br>上线</i></div></div>
+<div class="shard" data-ex="-152,-44,44,12"><div class="rig-note n2" aria-hidden="true"><i>IDEA!<br>+3</i></div></div>
+<div class="shard" data-ex="60,-96,-30,8"><div class="rig-note n3" aria-hidden="true"><i>别删<br>这行</i></div></div>`;
+$('#rigMain').innerHTML = RIG_HTML;
+$('#rigZoom').innerHTML = RIG_HTML;
+
+/* 3D 控制器工厂（场景内 + 模态内复用） */
+function makeRigControl(sceneEl, rigEl, rotOutEl, zoomOutEl, opts){
+  opts = opts || {};
+  let ry = 18, rx = 12, zoom = opts.zoom || 1;
+  let spinBoost = 0, dragging = false, lastX = 0, lastY = 0, vy = 0;
+  let hintHidden = false, stopped = false;
+  function fmt(n){ return String(Math.round(((n % 360) + 360) % 360)).padStart(3, '0') + '\u00B0'; }
+  function apply(){
+    rigEl.style.transform = 'scale(' + zoom + ') rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+    if(rotOutEl) rotOutEl.textContent = 'Y ' + fmt(ry) + ' X ' + fmt(rx);
+    if(zoomOutEl) zoomOutEl.textContent = zoom.toFixed(2) + '\u00D7';
+  }
+  let tickId = 0;
+  function tick(){
+    if(stopped) return;
+    let need = false;
+    if(!dragging){
+      if(spinBoost > .1){ ry += spinBoost; spinBoost *= .965; need = true; }
+      else if(Math.abs(vy) > .05){ ry += vy; vy *= .94; need = true; }
+      else if(opts.autoSpin !== false){ ry += .18; need = true; }
+    }
+    apply();
+    if(need) tickId = requestAnimationFrame(tick);
+  }
+  function wake(){ if(!tickId){ tickId = requestAnimationFrame(tick); } }
+  sceneEl.addEventListener('pointerdown', ev => {
+    if(ev.target.closest('.rig-btns') || ev.target.closest('.modal-close')) return;
+    dragging = true; lastX = ev.clientX; lastY = ev.clientY; vy = 0; spinBoost = 0;
+    try{ sceneEl.setPointerCapture(ev.pointerId); }catch(e){}
+    const tip = $('#rigTip');
+    if(tip && !hintHidden){ hintHidden = true; tip.style.opacity = '0'; }
+  });
+  sceneEl.addEventListener('pointermove', ev => {
+    if(!dragging) return;
+    const dx = ev.clientX - lastX, dy = ev.clientY - lastY;
+    lastX = ev.clientX; lastY = ev.clientY;
+    ry += dx * .38; rx = clamp(rx - dy * .26, -68, 68);
+    vy = dx * .12;
+    apply();
+  });
+  function endDrag(){ if(dragging){ dragging = false; wake(); } }
+  sceneEl.addEventListener('pointerup', endDrag);
+  sceneEl.addEventListener('pointercancel', endDrag);
+  /* 滚轮缩放 */
+  sceneEl.addEventListener('wheel', ev => {
+    ev.preventDefault();
+    zoom = clamp(zoom + (ev.deltaY > 0 ? -.08 : .08), .55, 2.6);
+    apply();
+  }, { passive: false });
+  apply();
+  wake();
+  return {
+    set(y, x, z){ ry = y; rx = x; if(z) zoom = z; apply(); wake(); },
+    kick(){ spinBoost = 14; wake(); },
+    wake
+  };
+}
+
+const rigCtlMain = makeRigControl($('#rigScene'), $('#rigMain'), $('#rigRotOut'), $('#rigZoomOut'), { autoSpin: true });
+const rigCtlZoom = makeRigControl($('#rigModalScene'), $('#rigZoom'), $('#rigZoomRotOut'), $('#rigZoomZoomOut'), { autoSpin: false, zoom: 1.4 });
+
+/* --- 打碎 / 重组 --- */
+function rigShatter(rigRoot, on, factor){
+  factor = factor || 1;
+  $$('.shard', rigRoot).forEach((sh, i) => {
+    const d = (sh.dataset.ex || '0,0,0,0').split(',').map(Number);
+    if(on){
+      sh.style.setProperty('--ex-x', Math.round((d[0] * factor) + rand(-22, 22)) + 'px');
+      sh.style.setProperty('--ex-y', Math.round((d[1] * factor) + rand(-22, 22)) + 'px');
+      sh.style.setProperty('--ex-z', Math.round((d[2] * factor) + rand(-22, 22)) + 'px');
+      sh.style.setProperty('--ex-r', Math.round(d[3] + rand(-12, 12)) + 'deg');
+      sh.style.transitionDelay = (i * 22) + 'ms';
+    }else{
+      sh.style.setProperty('--ex-x', '0px');
+      sh.style.setProperty('--ex-y', '0px');
+      sh.style.setProperty('--ex-z', '0px');
+      sh.style.setProperty('--ex-r', '0deg');
+      sh.style.transitionDelay = (i * 14) + 'ms';
+    }
+  });
+}
+function makeBreakCtl(rigRoot, btn, modeOut, ctl, factor){
+  let on = false;
+  function applyState(v){
+    on = v;
+    rigShatter(rigRoot, on, factor);
+    btn.textContent = on ? '重组' : '打碎它';
+    if(modeOut) modeOut.textContent = on ? '碎裂' : '组装';
+  }
+  btn.addEventListener('click', () => {
+    applyState(!on);
+    if(on){
+      ctl.kick();
+      const r = btn.getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top, 34);
+      toast('砰！零件全飞了——拖转看看内部构造');
+    }else{
+      toast('咔哒——重组完成，一台崭新的一号机');
+    }
+  });
+  return { set: applyState };
+}
+const rigBreakMain = makeBreakCtl($('#rigMain'), $('#rigBreakBtn'), $('#rigModeOut'), rigCtlMain, 1);
+const rigBreakZoom = makeBreakCtl($('#rigZoom'), $('#rigZoomBreakBtn'), $('#rigZoomModeOut'), rigCtlZoom, 1.3);
+
+$('#rigSpinBtn').addEventListener('click', () => { rigCtlMain.kick(); toast('一号机起飞'); });
+$('#rigFrontBtn').addEventListener('click', () => rigCtlZoom.set(18, 12, 1.4));
+$('#rigBackBtn').addEventListener('click', () => rigCtlZoom.set(198, 6, 1.6));
+
+/* 放大查看模态 */
+const rigModal = $('#rigModal');
+let rigLastFocus = null;
+function openRigModal(){
+  rigLastFocus = document.activeElement;
+  rigModal.classList.add('is-open');
+  rigModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  rigBreakZoom.set(false);
+  rigCtlZoom.set(18, 12, 1.4);
+  rigCtlZoom.wake();
+}
+function closeRigModal(){
+  rigModal.classList.remove('is-open');
+  rigModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if(rigLastFocus) rigLastFocus.focus();
+}
+$('#rigZoomBtn').addEventListener('click', openRigModal);
+rigModal.addEventListener('click', ev => { if(ev.target.closest('[data-rigclose]')) closeRigModal(); });
+addEventListener('keydown', ev => {
+  if(ev.key !== 'Escape') return;
+  if(rigModal.classList.contains('is-open')) closeRigModal();
+});
+
+/* 初始化磁吸墙（等布局稳定） */
+let mgInitTimer = null;
+const mgObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      clearTimeout(mgInitTimer);
+      mgInitTimer = setTimeout(mgInit, 120);
+      mgObs.disconnect();
+    }
+  });
+}, { threshold: .15 });
+mgObs.observe(mgWrap);
+
+})();
+</script>
 </body>
 </html>
